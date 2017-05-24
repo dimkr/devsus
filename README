@@ -9,11 +9,13 @@ Overview
 ========
 
 Devsus is a script that builds bootable, libre Devuan (http://www.devuan.org/)
-images for the Asus C201 Chromebook.
+images for the Asus C201 Chromebook, one of the few laptops able to boot and run
+without any non-free software, all the way down to the firmware level. The C201
+is supported by Libreboot (http://www.libreboot.org/).
 
-These images contain the latest Chrome OS kernel, deblobbed using the
-Linux-libre (http://linux-libre.fsfla.org/) scripts and tuned for smaller size
-and better performance.
+The images produced by Devsus contain the latest Chrome OS kernel, deblobbed
+using the Linux-libre (http://linux-libre.fsfla.org/) scripts and tuned for
+smaller size, better performance and shorter boot times.
 
 In addition, the images contain the latest firmware for the freedom-friendly,
 Atheros AR9271 based WiFi dongles.
@@ -38,23 +40,45 @@ packages installed:
 Building
 ========
 
-  # ./devsus
+	# ./devsus
 
-This produces two disk images:
+This produces two Devuan disk images:
 
 	1) devuan-jessie-c201-libre-16GB.img, a 16 GB image suitable for persistent
 	   installation; its size should be exactly the size of the internal SSD
 	2) devuan-jessie-c201-libre-2GB.img, a 2 GB image suitable for booting the
 	   laptop off USB
 
-To produce a bootable media, write one of the images to a block device (either a
-flash drive or a memory card):
+Usage
+=====
 
-	dd if=devuan-jessie-c201-libre-$SIZE.img of=/dev/$DEVICE bs=50M
+To produce a bootable media, write the 2 GB image to a flash drive (of at least
+2 GB):
 
-The latter (yes, the smaller image) contains the former under /. This way, it is
-possible to USB boot the laptop, then install Devuan persistently without having
-to download or store the 16 GB image separately.
+	# dd if=$SOMEWHERE/devuan-jessie-c201-libre-2GB.img of=/dev/$DEVICE bs=50M
+
+The root password is blank.
+
+The 2 GB image (yes, the smaller one) contains the larger, 16 GB one under /.
+This way, it is possible to boot the laptop through USB, then install Devuan
+persistently without having to download or store the large image separately.
+
+Persistent installation is performed using dd, too:
+
+	# dd if=/devuan-jessie-c201-libre-16GB.img of=/dev/mmcblk0 bs=50M
+
+Modifications
+=============
+
+The images produced by Devsus are very close to stock Devuan:
+
+	- Many redundant drivers were removed from the kernel
+	- Several responsiveness or performance vs. power consumption kernel
+	  configuration choices have been changed
+	- APT has been configured not to install "recommended" packages by default
+	- Some critical (like udev) or useful (like iw) packages have been added
+	- unscd has been added, to cache DNS
+	- The number of virtual consoles has been reduced from 6 to 2
 
 Credits and Legal Information
 =============================
