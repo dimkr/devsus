@@ -100,7 +100,7 @@ install -D -m 644 80disable-recommends $outmnt/etc/apt/apt.conf.d/80disable-reco
 cp -f /etc/resolv.conf $outmnt/etc/
 chroot $outmnt apt update
 chroot $outmnt apt install -y udev kmod net-tools inetutils-ping traceroute iproute2 isc-dhcp-client wpasupplicant iw alsa-utils cgpt vim-tiny less psmisc netcat-openbsd ca-certificates bzip2 xz-utils unscd
-chroot $outmnt apt-get autoremove
+chroot $outmnt apt-get autoremove --purge
 chroot $outmnt apt-get clean
 sed -i s/^[3-6]/\#\&/g $outmnt/etc/inittab
 sed -i s/'enable-cache            hosts   no'/'enable-cache            hosts   yes'/ -i $outmnt/etc/nscd.conf
