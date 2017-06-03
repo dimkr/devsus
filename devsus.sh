@@ -19,6 +19,8 @@
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #  MA 02110-1301, USA.
 
+KVER=4.9.30
+
 outmnt=$(mktemp -d -p `pwd`)
 inmnt=$(mktemp -d -p `pwd`)
 
@@ -39,16 +41,15 @@ cleanup() {
 
 trap cleanup INT TERM EXIT
 
-# build the Chrome OS kernel, with ath9k_htc and without many useless drivers
-[ ! -d chromeos-3.14 ] && git clone --depth 1 -b chromeos-3.14 https://chromium.googlesource.com/chromiumos/third_party/kernel chromeos-3.14
-[ ! -f deblob-3.14 ] && wget http://linux-libre.fsfla.org/pub/linux-libre/releases/LATEST-3.14.N/deblob-3.14
-[ ! -f deblob-check ] && wget http://linux-libre.fsfla.org/pub/linux-libre/releases/LATEST-3.14.N/deblob-check
-cd chromeos-3.14
-# deblob as much as possible - the diff against vanilla 3.14.x is big but
-# blob-free ath9k_htc should be only driver that requests firmware
-AWK=gawk sh ../deblob-3.14 --force
-export WIFIVERSION=-3.8
-./chromeos/scripts/prepareconfig chromiumos-rockchip
+# build Linux-libre, with ath9k_htc and without many useless drivers
+[ ! -f linux-libre-$KVER-gnu.tar.xz ] && wget https://www.linux-libre.fsfla.org/pub/linux-libre/releases/$KVER-gnu/linux-libre-$KVER-gnu.tar.xz
+[ ! -d linux-$KVER ] && tar -xJf linux-libre-$KVER-gnu.tar.xz
+cd linux-$KVER
+make clean
+make mrproper
+# reset the minor version number, so out-of-tree drivers continue to work after
+# a kernel upgrade
+sed s/'SUBLEVEL = .*'/'SUBLEVEL = 0'/ -i Makefile
 cp ../config .config
 make -j `grep ^processor /proc/cpuinfo  | wc -l` CROSS_COMPILE=arm-none-eabi- ARCH=arm zImage modules dtbs
 [ ! -h kernel.its ] && ln -s ../kernel.its .
@@ -108,8 +109,8 @@ rm -f $outmnt/etc/resolv.conf
 
 # put the kernel in the kernel partition, modules in /lib/modules and AR9271
 # firmware in /lib/firmware
-dd if=chromeos-3.14/vmlinux.kpart of=${outdev}p1 conv=notrunc
-make -C chromeos-3.14 ARCH=arm INSTALL_MOD_PATH=$outmnt modules_install
+dd if=linux-$KVER/vmlinux.kpart of=${outdev}p1 conv=notrunc
+make -C linux-$KVER ARCH=arm INSTALL_MOD_PATH=$outmnt modules_install
 rm -f $outmnt/lib/modules/3.14.0/{build,source}
 install -D -m 644 open-ath9k-htc-firmware/target_firmware/htc_9271.fw $outmnt/lib/firmware/htc_9271.fw
 

@@ -13,9 +13,9 @@ images for the Asus C201 Chromebook, one of the few laptops able to boot and run
 without any non-free software, all the way down to the firmware level. The C201
 is supported by Libreboot (http://www.libreboot.org/).
 
-The images produced by Devsus contain the latest Chrome OS kernel, deblobbed
-using the Linux-libre (http://linux-libre.fsfla.org/) scripts and tuned for
-smaller size, better performance and shorter boot times.
+The images produced by Devsus contain the a recent Linux-libre
+(http://linux-libre.fsfla.org/) longterm kernel tuned for small size, good
+performance and short boot times.
 
 In addition, the images contain the latest firmware for the freedom-friendly,
 Atheros AR9271 based WiFi dongles.
@@ -65,16 +65,13 @@ persistently without having to download or store the large image separately.
 
 Persistent installation is performed using dd, too:
 
-	# dd if=/devuan-jessie-c201-libre-16GB.img of=/dev/mmcblk0 bs=50M
+	# dd if=/devuan-jessie-c201-libre-16GB.img of=/dev/mmcblk0
 
 Modifications
 =============
 
 The images produced by Devsus are very close to stock Devuan:
 
-	- Many redundant drivers were removed from the kernel
-	- Several responsiveness or performance vs. power consumption kernel
-	  configuration choices have been changed
 	- APT has been configured not to install "recommended" packages by default
 	- Some critical (like udev) or useful (like iw) packages have been added
 	- unscd has been added, to cache DNS
@@ -83,8 +80,8 @@ The images produced by Devsus are very close to stock Devuan:
 Credits and Legal Information
 =============================
 
-Devsus' kernel building procedure is based on the linux-veyron package of Arch
-Linux ARM (http://www.archlinuxarm.org/).
+Devsus' previous kernel building procedure was based on the linux-veyron package
+of Arch Linux ARM (http://www.archlinuxarm.org/).
 
 Devsus is free and unencumbered software released under the terms of the GNU
 General Public License, version 2; see COPYING for the license text. For a list
