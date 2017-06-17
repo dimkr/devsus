@@ -27,7 +27,7 @@ a WiFi network.
 Dependencies
 ============
 
-Devsus has been tested on Devuan 7 (Jessie) on x86_64, with the following
+Devsus has been tested on Devuan 1 (Jessie) on x86_64, with the following
 packages installed:
 
 	apt install --no-install-recommends --no-install-suggests \
@@ -40,7 +40,7 @@ packages installed:
 Building
 ========
 
-	# ./devsus
+	# ./devsus.sh
 
 This produces two Devuan disk images:
 
