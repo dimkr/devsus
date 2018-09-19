@@ -94,10 +94,10 @@ create_image() {
 }
 
 # create a 2GB image with the Chrome OS partition layout
-create_image devuan-jessie-c201-libre-2GB.img $outdev 50M 40 $outmnt
+create_image devuan-ascii-c201-libre-2GB.img $outdev 50M 40 $outmnt
 
 # install Devuan on it
-qemu-debootstrap --arch=armhf --foreign jessie --variant minbase $outmnt http://packages.devuan.org/merged
+qemu-debootstrap --arch=armhf --foreign ascii --variant minbase $outmnt http://packages.devuan.org/merged
 chroot $outmnt passwd -d root
 echo -n devsus > $outmnt/etc/hostname
 install -D -m 644 80disable-recommends $outmnt/etc/apt/apt.conf.d/80disable-recommends
@@ -118,7 +118,7 @@ rm -f $outmnt/lib/modules/${KVER%.*}.0/{build,source}
 install -D -m 644 open-ath9k-htc-firmware/target_firmware/htc_9271.fw $outmnt/lib/firmware/htc_9271.fw
 
 # create a 16GB image
-create_image devuan-jessie-c201-libre-16GB.img $indev 512 30785536 $inmnt
+create_image devuan-ascii-c201-libre-16GB.img $indev 512 30785536 $inmnt
 
 # copy the kernel and / of the 2GB image to the 16GB one
 dd if=${outdev}p1 of=${indev}p1 conv=notrunc
@@ -129,4 +129,4 @@ rmdir $inmnt
 losetup -d $indev
 
 # move the 16GB image inside the 2GB one
-cp -f devuan-jessie-c201-libre-16GB.img $outmnt/
+cp -f devuan-ascii-c201-libre-16GB.img $outmnt/

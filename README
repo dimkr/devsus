@@ -13,7 +13,7 @@ images for the Asus C201 Chromebook, one of the few laptops able to boot and run
 without any non-free software, all the way down to the firmware level. The C201
 is supported by Libreboot (http://www.libreboot.org/).
 
-The images produced by Devsus contain the a recent Linux-libre
+The images produced by Devsus contain a Linux-libre
 (http://linux-libre.fsfla.org/) longterm kernel tuned for small size, good
 performance and short boot times.
 
@@ -27,7 +27,7 @@ a WiFi network.
 Dependencies
 ============
 
-Devsus has been tested on Devuan 7 (Jessie) on x86_64, with the following
+Devsus has been tested on Devuan 2 (ASCII) on x86_64, with the following
 packages installed:
 
 	apt install --no-install-recommends --no-install-suggests \
@@ -35,18 +35,19 @@ packages installed:
 		git gawk device-tree-compiler vboot-kernel-utils gcc-arm-none-eabi \
 			u-boot-tools
 		gcc make libc-dev wget g++ cmake \
-		binfmt-support qemu-user-static debootstrap
+		binfmt-support qemu-user-static debootstrap \
+		bc wget xz-utils
 
 Building
 ========
 
-	# ./devsus
+	# ./devsus.sh
 
 This produces two Devuan disk images:
 
-	1) devuan-jessie-c201-libre-16GB.img, a 16 GB image suitable for persistent
+	1) devuan-ascii-c201-libre-16GB.img, a 16 GB image suitable for persistent
 	   installation; its size should be exactly the size of the internal SSD
-	2) devuan-jessie-c201-libre-2GB.img, a 2 GB image suitable for booting the
+	2) devuan-ascii-c201-libre-2GB.img, a 2 GB image suitable for booting the
 	   laptop off USB
 
 Usage
@@ -55,7 +56,7 @@ Usage
 To produce a bootable media, write the 2 GB image to a flash drive (of at least
 2 GB):
 
-	# dd if=$SOMEWHERE/devuan-jessie-c201-libre-2GB.img of=/dev/$DEVICE bs=50M
+	# dd if=$SOMEWHERE/devuan-ascii-c201-libre-2GB.img of=/dev/$DEVICE bs=50M
 
 The root password is blank.
 
@@ -65,7 +66,7 @@ persistently without having to download or store the large image separately.
 
 Persistent installation is performed using dd, too:
 
-	# dd if=/devuan-jessie-c201-libre-16GB.img of=/dev/mmcblk0
+	# dd if=/devuan-ascii-c201-libre-16GB.img of=/dev/mmcblk0
 
 Modifications
 =============
