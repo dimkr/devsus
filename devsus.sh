@@ -41,12 +41,15 @@ cleanup() {
 
 trap cleanup INT TERM EXIT
 
-# build Linux-libre, with ath9k_htc and without many useless drivers
+# build Linux-libre
 [ ! -f linux-libre-$KVER-gnu.tar.xz ] && wget https://www.linux-libre.fsfla.org/pub/linux-libre/releases/$KVER-gnu/linux-libre-$KVER-gnu.tar.xz
 [ ! -d linux-$KVER ] && tar -xJf linux-libre-$KVER-gnu.tar.xz
+[ ! -f ath9k_htc_do_not_use_bulk_on_ep3_and_ep4.patch ] && wget -O ath9k_htc_do_not_use_bulk_on_ep3_and_ep4.patch https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/patch/?id=2b721118b7821107757eb1d37af4b60e877b27e7
 cd linux-$KVER
 make clean
 make mrproper
+# work around instability of ath9k_htc, see https://github.com/SolidHal/PrawnOS/issues/38
+patch -R -p 1 < ../ath9k_htc_do_not_use_bulk_on_ep3_and_ep4.patch
 # reset the minor version number, so out-of-tree drivers continue to work after
 # a kernel upgrade
 sed s/'SUBLEVEL = .*'/'SUBLEVEL = 0'/ -i Makefile

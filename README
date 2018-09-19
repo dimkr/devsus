@@ -83,6 +83,9 @@ Credits and Legal Information
 Devsus' previous kernel building procedure was based on the linux-veyron package
 of Arch Linux ARM (http://www.archlinuxarm.org/).
 
+Devsus' workaround for ath9k_htc instability issues has been adopted from
+PrawnOS (https://github.com/SolidHal/PrawnOS) and found by SolidHal.
+
 Devsus is free and unencumbered software released under the terms of the GNU
 General Public License, version 2; see COPYING for the license text. For a list
 of its authors and contributors, see AUTHORS.
