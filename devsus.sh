@@ -111,7 +111,7 @@ rm -f $outmnt/etc/resolv.conf
 # firmware in /lib/firmware
 dd if=linux-$KVER/vmlinux.kpart of=${outdev}p1 conv=notrunc
 make -C linux-$KVER ARCH=arm INSTALL_MOD_PATH=$outmnt modules_install
-rm -f $outmnt/lib/modules/3.14.0/{build,source}
+rm -f $outmnt/lib/modules/${KVER%.*}.0/{build,source}
 install -D -m 644 open-ath9k-htc-firmware/target_firmware/htc_9271.fw $outmnt/lib/firmware/htc_9271.fw
 
 # create a 16GB image
