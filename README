@@ -33,7 +33,7 @@ packages installed:
 	apt install --no-install-recommends --no-install-suggests \
 		parted cgpt \
 		git gawk device-tree-compiler vboot-kernel-utils gcc-arm-none-eabi \
-			u-boot-tools
+			u-boot-tools \
 		gcc make libc-dev wget g++ cmake \
 		binfmt-support qemu-user-static debootstrap \
 		bc wget xz-utils
