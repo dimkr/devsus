@@ -36,7 +36,7 @@ packages installed:
 			u-boot-tools \
 		gcc make libc-dev wget g++ cmake \
 		binfmt-support qemu-user-static debootstrap \
-		bc wget xz-utils
+		bc wget xz-utils m4
 
 Building
 ========
