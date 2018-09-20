@@ -19,7 +19,7 @@
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #  MA 02110-1301, USA.
 
-KVER=4.9.127
+KVER=4.9
 
 outmnt=$(mktemp -d -p `pwd`)
 inmnt=$(mktemp -d -p `pwd`)
@@ -42,10 +42,13 @@ cleanup() {
 trap cleanup INT TERM EXIT
 
 # build Linux-libre
-[ ! -f linux-libre-$KVER-gnu.tar.xz ] && wget https://www.linux-libre.fsfla.org/pub/linux-libre/releases/$KVER-gnu/linux-libre-$KVER-gnu.tar.xz
+minor=`wget -q -O- http://linux-libre.fsfla.org/pub/linux-libre/releases/LATEST-$KVER.N/ | grep -F patch-$KVER-gnu | head -n 1 | cut -f 9 -d . | cut -f 1 -d -`
+[ ! -f linux-libre-$KVER-gnu.tar.xz ] && wget http://linux-libre.fsfla.org/pub/linux-libre/releases/LATEST-4.9.0/linux-libre-$KVER-gnu.tar.xz
+[ ! -f patch-$KVER-gnu-$KVER.$minor-gnu ] && wget -O- https://www.linux-libre.fsfla.org/pub/linux-libre/releases/LATEST-$KVER.N/patch-$KVER-gnu-$KVER.$minor-gnu.xz | xz -d > patch-$KVER-gnu-$KVER.$minor-gnu
 [ ! -d linux-$KVER ] && tar -xJf linux-libre-$KVER-gnu.tar.xz
 [ ! -f ath9k_htc_do_not_use_bulk_on_ep3_and_ep4.patch ] && wget -O ath9k_htc_do_not_use_bulk_on_ep3_and_ep4.patch https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/patch/?id=2b721118b7821107757eb1d37af4b60e877b27e7
 cd linux-$KVER
+patch -p 1 < ../patch-$KVER-gnu-$KVER.$minor-gnu
 make clean
 make mrproper
 # work around instability of ath9k_htc, see https://github.com/SolidHal/PrawnOS/issues/38
@@ -53,7 +56,7 @@ patch -R -p 1 < ../ath9k_htc_do_not_use_bulk_on_ep3_and_ep4.patch
 # reset the minor version number, so out-of-tree drivers continue to work after
 # a kernel upgrade
 sed s/'SUBLEVEL = .*'/'SUBLEVEL = 0'/ -i Makefile
-cp ../config .config
+cp -f ../config .config
 make olddefconfig
 make -j `grep ^processor /proc/cpuinfo  | wc -l` CROSS_COMPILE=arm-none-eabi- ARCH=arm zImage modules dtbs
 [ ! -h kernel.its ] && ln -s ../kernel.its .
