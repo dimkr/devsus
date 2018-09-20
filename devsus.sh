@@ -39,14 +39,16 @@ cleanup() {
 	losetup -d $outdev > /dev/null 2>&1
 }
 
-trap cleanup INT TERM EXIT
+[ "$CI" != true ] && trap cleanup INT TERM EXIT
 
-# build Linux-libre
 minor=`wget -q -O- http://linux-libre.fsfla.org/pub/linux-libre/releases/LATEST-$KVER.N/ | grep -F patch-$KVER-gnu | head -n 1 | cut -f 9 -d . | cut -f 1 -d -`
 [ ! -f linux-libre-$KVER-gnu.tar.xz ] && wget http://linux-libre.fsfla.org/pub/linux-libre/releases/LATEST-4.9.0/linux-libre-$KVER-gnu.tar.xz
 [ ! -f patch-$KVER-gnu-$KVER.$minor-gnu ] && wget -O- https://www.linux-libre.fsfla.org/pub/linux-libre/releases/LATEST-$KVER.N/patch-$KVER-gnu-$KVER.$minor-gnu.xz | xz -d > patch-$KVER-gnu-$KVER.$minor-gnu
-[ ! -d linux-$KVER ] && tar -xJf linux-libre-$KVER-gnu.tar.xz
 [ ! -f ath9k_htc_do_not_use_bulk_on_ep3_and_ep4.patch ] && wget -O ath9k_htc_do_not_use_bulk_on_ep3_and_ep4.patch https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/patch/?id=2b721118b7821107757eb1d37af4b60e877b27e7
+[ ! -d open-ath9k-htc-firmware ] && git clone --depth 1 https://github.com/qca/open-ath9k-htc-firmware.git
+
+# build Linux-libre
+[ ! -d linux-$KVER ] && tar -xJf linux-libre-$KVER-gnu.tar.xz
 cd linux-$KVER
 patch -p 1 < ../patch-$KVER-gnu-$KVER.$minor-gnu
 make clean
@@ -57,8 +59,21 @@ patch -R -p 1 < ../ath9k_htc_do_not_use_bulk_on_ep3_and_ep4.patch
 # a kernel upgrade
 sed s/'SUBLEVEL = .*'/'SUBLEVEL = 0'/ -i Makefile
 cp -f ../config .config
-make olddefconfig
-make -j `grep ^processor /proc/cpuinfo  | wc -l` CROSS_COMPILE=arm-none-eabi- ARCH=arm zImage modules dtbs
+
+kmake="make -j `grep ^processor /proc/cpuinfo  | wc -l` CROSS_COMPILE=arm-none-eabi- ARCH=arm"
+
+$kmake olddefconfig
+$kmake modules_prepare
+$kmake SUBDIRS=drivers/usb/dwc2 modules
+$kmake SUBDIRS=drivers/net/wireless/ath/ath9k modules
+$kmake SUBDIRS=drivers/bluetooth modules
+$kmake dtbs
+
+# CI flow ends here
+[ "$CI" = true ] && exit 0
+
+$kmake zImage modules
+
 [ ! -h kernel.its ] && ln -s ../kernel.its .
 mkimage -D "-I dts -O dtb -p 2048" -f kernel.its vmlinux.uimg
 dd if=/dev/zero of=bootloader.bin bs=512 count=1
@@ -73,7 +88,6 @@ vbutil_kernel --pack vmlinux.kpart \
 cd ..
 
 # build AR9271 firmware
-[ ! -d open-ath9k-htc-firmware ] && git clone --depth 1 https://github.com/qca/open-ath9k-htc-firmware.git
 cd open-ath9k-htc-firmware
 make toolchain
 make -C target_firmware
