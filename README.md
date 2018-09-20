@@ -13,7 +13,7 @@ Overview
 
 Devsus is a script that builds bootable, libre [Devuan](http://www.devuan.org/) images for the Asus C201 Chromebook, one of the few laptops able to boot and run without any non-free software, all the way down to the firmware level. The C201 is supported by [Libreboot](http://www.libreboot.org/).
 
-The images produced by Devsus contain a [Linux-libre](http://linux-libre.fsfla.org/) longterm kernel tuned for small size, good performance and short boot times.
+The images produced by Devsus contain the latest [Linux-libre](http://linux-libre.fsfla.org/) 4.9.x kernel, tuned for small size, good performance and short boot times. This kernel branch has been chosen for its [longterm](https://www.kernel.org/category/releases.html) status, which means that freedom-respecting C201 laptops are usable at least until this kernel branch is phased out.
 
 Some features of the Rockchip RK3288 SoC, including built-in WiFi support, require use of non-free software. Therefore, they are unsupported by Devsus. To compensate for that, the Devsus kernel includes support for freedom-friendly devices:
 
