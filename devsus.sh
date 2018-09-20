@@ -54,6 +54,7 @@ patch -R -p 1 < ../ath9k_htc_do_not_use_bulk_on_ep3_and_ep4.patch
 # a kernel upgrade
 sed s/'SUBLEVEL = .*'/'SUBLEVEL = 0'/ -i Makefile
 cp ../config .config
+make olddefconfig
 make -j `grep ^processor /proc/cpuinfo  | wc -l` CROSS_COMPILE=arm-none-eabi- ARCH=arm zImage modules dtbs
 [ ! -h kernel.its ] && ln -s ../kernel.its .
 mkimage -D "-I dts -O dtb -p 2048" -f kernel.its vmlinux.uimg
