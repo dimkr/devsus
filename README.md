@@ -20,7 +20,10 @@ Some features of the Rockchip RK3288 SoC, including built-in WiFi support, requi
 * Firmware for Atheros AR9271 based WiFi dongles
 * Drivers for Qualcomm CSR8510 based Bluetooth dongles
 
-Moreover, the Devuan installation is very minimal and consists of a barebones Devuan base, plus crucial command-line tools, like those required to connect to a WiFi network.
+Also, the images contain:
+* Crucial command-line tools, like those required to connect to a WiFi network
+* A [Ratpoison](https://www.nongnu.org/ratpoison/)-based, keyboard-controlled, graphical environment
+* [Firefox](https://www.mozilla.org/en-US/firefox/) ESR, pre-configured for enhanced privacy and responsiveness on the C201
 
 Dependencies
 ============
@@ -30,10 +33,10 @@ Devsus has been tested on Devuan 2 (ASCII) on x86_64, with the following package
 	apt install --no-install-recommends --no-install-suggests \
 		parted cgpt \
 		git gawk device-tree-compiler vboot-kernel-utils gcc-arm-none-eabi \
-			u-boot-tools \
-		gcc make libc-dev wget g++ cmake \
+		u-boot-tools \
+		gcc make libc6-dev wget g++ cmake \
 		binfmt-support qemu-user-static debootstrap \
-		bc wget xz-utils m4 patch
+		bc wget xz-utils m4 patch ca-certificates bzip2
 
 Building
 ========
@@ -60,15 +63,36 @@ Persistent installation is performed using dd, too:
 
 	# dd if=/devuan-ascii-c201-libre-16GB.img of=/dev/mmcblk0
 
-Modifications
-=============
+Graphical Desktop
+=================
 
-The images produced by Devsus are very close to stock Devuan:
+First, create a regular user:
 
-* APT has been configured not to install "recommended" packages by default
-* Some critical (like udev) or useful (like iw) packages have been added
-* unscd has been added, to cache DNS
-* The number of virtual consoles has been reduced from 6 to 2
+	# useradd -m -s /bin/bash user_name_goes_here
+	# passwd user_name_goes_here
+
+Then, log in as the new user.
+
+To start the graphical desktop:
+
+	$ startx
+
+The browser and the terminal are started automatically.
+
+The window manager is controlled using the keyboard:
+
+* Search + c spawns a new terminal window
+* Search + n switches to the next window
+* Search + p switches to the previous window
+* Search + k closes a window
+* Search + ! run a shell command
+
+The special actions of function keys are triggered by pressing them together with the control key.
+
+For a list of all key bindings:
+
+	$ man ratpoison
+	$ cat ~/.xbindkeysrc
 
 Credits and Legal Information
 =============================

@@ -1,0 +1,7 @@
+startup_message off
+set border 2
+set fwcolor green
+set barpadding 0 0
+set warp 1
+escape Super_L
+bind q quit

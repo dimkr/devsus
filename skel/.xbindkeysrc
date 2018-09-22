@@ -1,0 +1,59 @@
+"xvkbd -xsendevent -text "\A\[Left]""
+	m:0x4 + c:67
+	Control + F1
+
+"xvkbd -xsendevent -text "\A\[Right]""
+	m:0x4 + c:68
+	Control + F2
+
+"xvkbd -xsendevent -text "\Cr""
+	m:0x4 + c:69
+	Control + F3
+
+"xvkbd -xsendevent -text "\[F11]""
+	m:0x4 + c:70
+	Control + F4
+
+"urxvtc -e htop"
+	m:0x4 + c:71
+	Control + F5
+
+"sh -c 'echo $((`cat /sys/devices/platform/backlight/backlight/backlight/brightness` - 1)) > /sys/devices/platform/backlight/backlight/backlight/brightness'"
+	m:0x4 + c:72
+	Control + F6
+
+"sh -c 'echo $((`cat /sys/devices/platform/backlight/backlight/backlight/brightness` + 1)) > /sys/devices/platform/backlight/backlight/backlight/brightness'"
+	m:0x4 + c:73
+	Control + F7
+
+"pactl set-sink-mute @DEFAULT_SINK@ toggle"
+	m:0x4 + c:74
+	Control + F8
+
+"pactl set-sink-volume @DEFAULT_SINK@ -5%"
+	m:0x4 + c:75
+	Control + F9
+
+"pactl set-sink-volume @DEFAULT_SINK@ +5%"
+	m:0x4 + c:76
+	Control + F10
+
+"xvkbd -xsendevent -text '\[Delete]'"
+	m:0x8 + c:22
+	Alt + BackSpace
+
+"xvkbd -xsendevent -text '\[End]'"
+	m:0x8 + c:114
+	Alt + Right
+
+"xvkbd -xsendevent -text '\[Home]'"
+	m:0x8 + c:113
+	Alt + Left
+
+"xvkbd -xsendevent -text '\[Page_Down]'"
+	m:0x8 + c:116
+	Alt + Down
+
+"xvkbd -xsendevent -text '\[Page_Up]'"
+	m:0x8 + c:111
+	Alt + Up

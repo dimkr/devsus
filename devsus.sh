@@ -46,6 +46,7 @@ minor=`wget -q -O- http://linux-libre.fsfla.org/pub/linux-libre/releases/LATEST-
 [ ! -f patch-$KVER-gnu-$KVER.$minor-gnu ] && wget -O- https://www.linux-libre.fsfla.org/pub/linux-libre/releases/LATEST-$KVER.N/patch-$KVER-gnu-$KVER.$minor-gnu.xz | xz -d > patch-$KVER-gnu-$KVER.$minor-gnu
 [ ! -f ath9k_htc_do_not_use_bulk_on_ep3_and_ep4.patch ] && wget -O ath9k_htc_do_not_use_bulk_on_ep3_and_ep4.patch https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/patch/?id=2b721118b7821107757eb1d37af4b60e877b27e7
 [ ! -d open-ath9k-htc-firmware ] && git clone --depth 1 https://github.com/qca/open-ath9k-htc-firmware.git
+[ ! -f hosts ] && wget -O- https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews/hosts | grep ^0\.0\.0\.0 | awk '{print $1" "$2}' | grep -F -v "0.0.0.0 0.0.0.0" > hosts
 
 # build Linux-libre
 [ ! -d linux-$KVER ] && tar -xJf linux-libre-$KVER-gnu.tar.xz
@@ -118,21 +119,59 @@ create_image devuan-ascii-c201-libre-2GB.img $outdev 50M 40 $outmnt
 qemu-debootstrap --arch=armhf --foreign ascii --variant minbase $outmnt http://packages.devuan.org/merged
 chroot $outmnt passwd -d root
 echo -n devsus > $outmnt/etc/hostname
+
+# install stable release updates as soon as they're available
+install -m 644 sources.list $outmnt/etc/apt/sources.list
+
+# disable installation of recommended, not strictly necessary packages
 install -D -m 644 80disable-recommends $outmnt/etc/apt/apt.conf.d/80disable-recommends
+
 cp -f /etc/resolv.conf $outmnt/etc/
 chroot $outmnt apt update
-chroot $outmnt apt install -y udev kmod net-tools inetutils-ping traceroute iproute2 isc-dhcp-client wpasupplicant iw alsa-utils cgpt vim-tiny less psmisc netcat-openbsd ca-certificates bzip2 xz-utils unscd
+DEBIAN_FRONTEND=noninteractive chroot $outmnt apt upgrade -y
+DEBIAN_FRONTEND=noninteractive chroot $outmnt apt install -y eudev kmod net-tools inetutils-ping traceroute iproute2 isc-dhcp-client wpasupplicant iw alsa-utils cgpt elvis-tiny less psmisc netcat-traditional ca-certificates bzip2 xz-utils unscd dbus bluez pulseaudio pulseaudio-module-bluetooth elogind libpam-elogind ntp xserver-xorg-core xserver-xorg-input-libinput xserver-xorg-video-fbdev libgl1-mesa-dri xserver-xorg-input-synaptics xinit x11-xserver-utils ratpoison xbindkeys xvkbd rxvt-unicode htop firefox-esr locales man-db
 chroot $outmnt apt-get autoremove --purge
 chroot $outmnt apt-get clean
+
+# set the default PulseAudio devices; otherwise, it uses dummy ones
+echo "load-module module-alsa-sink device=sysdefault
+load-module module-alsa-source device=sysdefault" >> $outmnt/etc/pulse/default.pa
+
+# disable saving of dmesg output in /var/log
+chroot $outmnt update-rc.d bootlogs disable
+
+# reduce the number of virtual consoles
 sed -i s/^[3-6]/\#\&/g $outmnt/etc/inittab
+
+# enable DNS cache
 sed -i s/'enable-cache            hosts   no'/'enable-cache            hosts   yes'/ -i $outmnt/etc/nscd.conf
+
+# prevent DNS lookup of the default hostname, which dicloses the OS to a
+# potential attacker
+echo "127.0.0.1 devsus" >> $outmnt/etc/hosts
+
+# block malware and advertising domains
+cat hosts >> $outmnt/etc/hosts
+
 rm -f $outmnt/etc/resolv.conf
+
+# allow unprivileged users to write to /sys/devices/platform/backlight/backlight/backlight/brightness
+install -m 644 99-brightness.rules $outmnt/etc/udev/rules.d/99-brightness.rules
+
+install -m 644 skel/.xbindkeysrc $outmnt/etc/skel/.xbindkeysrc
+install -D -m 644 skel/.config/htop/htoprc $outmnt/etc/skel/.config/htop/htoprc
+install -m 744 skel/.xinitrc $outmnt/etc/skel/.xinitrc
+install -m 644 skel/.ratpoisonrc $outmnt/etc/skel/.ratpoisonrc
+
+# change the default settings of firefox-esr
+install -m 644 skel/devsus-settings.js $outmnt/usr/lib/firefox-esr/defaults/pref/devsus-settings.js
+install -m 644 skel/devsus.cfg $outmnt/usr/lib/firefox-esr/devsus.cfg
 
 # put the kernel in the kernel partition, modules in /lib/modules and AR9271
 # firmware in /lib/firmware
 dd if=linux-$KVER/vmlinux.kpart of=${outdev}p1 conv=notrunc
 make -C linux-$KVER ARCH=arm INSTALL_MOD_PATH=$outmnt modules_install
-rm -f $outmnt/lib/modules/${KVER%.*}.0/{build,source}
+rm -f $outmnt/lib/modules/$KVER.0-gnu/{build,source}
 install -D -m 644 open-ath9k-htc-firmware/target_firmware/htc_9271.fw $outmnt/lib/firmware/htc_9271.fw
 
 # create a 16GB image
