@@ -163,6 +163,9 @@ install -D -m 644 skel/.config/htop/htoprc $outmnt/etc/skel/.config/htop/htoprc
 install -m 744 skel/.xinitrc $outmnt/etc/skel/.xinitrc
 install -m 644 skel/.ratpoisonrc $outmnt/etc/skel/.ratpoisonrc
 
+# enable font hinting
+install -D -m 644 skel/.config/fontconfig/conf.d/99-devsus.conf $outmnt/etc/skel/.config/fontconfig/conf.d/99-devsus.conf
+
 # change the default settings of firefox-esr
 install -m 644 skel/devsus-settings.js $outmnt/usr/lib/firefox-esr/defaults/pref/devsus-settings.js
 install -m 644 skel/devsus.cfg $outmnt/usr/lib/firefox-esr/devsus.cfg
