@@ -161,6 +161,9 @@ install -m 644 99-brightness.rules $outmnt/etc/udev/rules.d/99-brightness.rules
 # give ath9k_htc devices a random MAC address
 install -m 644 98-mac.rules $outmnt/etc/udev/rules.d/98-mac.rules
 
+# make /tmp a tmpfs, to reduce disk I/O
+install -m 644 fstab $outmnt/etc/fstab
+
 install -m 644 skel/.xbindkeysrc $outmnt/etc/skel/.xbindkeysrc
 install -D -m 644 skel/.config/htop/htoprc $outmnt/etc/skel/.config/htop/htoprc
 install -m 744 skel/.xinitrc $outmnt/etc/skel/.xinitrc

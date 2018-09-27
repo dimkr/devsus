@@ -1,0 +1,1 @@
+tmpfs	/tmp	tmpfs	noexec,nodev,nosuid,size=10%,mode=1777	0	0
