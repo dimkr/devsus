@@ -129,7 +129,7 @@ install -D -m 644 80disable-recommends $outmnt/etc/apt/apt.conf.d/80disable-reco
 cp -f /etc/resolv.conf $outmnt/etc/
 chroot $outmnt apt update
 DEBIAN_FRONTEND=noninteractive chroot $outmnt apt upgrade -y
-DEBIAN_FRONTEND=noninteractive chroot $outmnt apt install -y eudev kmod net-tools inetutils-ping traceroute iproute2 isc-dhcp-client wpasupplicant iw alsa-utils cgpt elvis-tiny less psmisc netcat-traditional ca-certificates bzip2 xz-utils unscd dbus bluez pulseaudio pulseaudio-module-bluetooth elogind libpam-elogind ntp xserver-xorg-core xserver-xorg-input-libinput xserver-xorg-video-fbdev libgl1-mesa-dri xserver-xorg-input-synaptics xinit x11-xserver-utils ratpoison xbindkeys xvkbd rxvt-unicode htop firefox-esr mupdf locales man-db
+DEBIAN_FRONTEND=noninteractive chroot $outmnt apt install -y eudev kmod net-tools inetutils-ping traceroute iproute2 isc-dhcp-client wpasupplicant iw alsa-utils cgpt elvis-tiny less psmisc netcat-traditional ca-certificates bzip2 xz-utils unscd dbus dbus-x11 bluez pulseaudio pulseaudio-module-bluetooth elogind libpam-elogind ntp xserver-xorg-core xserver-xorg-input-libinput xserver-xorg-video-fbdev libgl1-mesa-dri xserver-xorg-input-synaptics xinit x11-xserver-utils ratpoison xbindkeys xvkbd rxvt-unicode htop firefox-esr mupdf locales man-db dmz-cursor-theme
 chroot $outmnt apt-get autoremove --purge
 chroot $outmnt apt-get clean
 
@@ -171,6 +171,9 @@ install -m 644 skel/.ratpoisonrc $outmnt/etc/skel/.ratpoisonrc
 
 # enable font hinting
 install -D -m 644 skel/.config/fontconfig/conf.d/99-devsus.conf $outmnt/etc/skel/.config/fontconfig/conf.d/99-devsus.conf
+
+# set the cursor theme
+install -D -m 644 skel/.icons/default/index.theme $outmnt/etc/skel/.icons/default/index.theme
 
 # change the default settings of firefox-esr
 install -m 644 skel/devsus-settings.js $outmnt/usr/lib/firefox-esr/defaults/pref/devsus-settings.js
