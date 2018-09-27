@@ -153,7 +153,7 @@ echo "127.0.0.1 devsus" >> $outmnt/etc/hosts
 # block malware and advertising domains
 cat hosts >> $outmnt/etc/hosts
 
-rm -f $outmnt/etc/resolv.conf
+rm -f $outmnt/etc/resolv.conf $outmnt/var/log/*log $outmnt/var/log/dmesg $outmnt/var/log/fsck/* $outmnt/var/log/apt/*
 
 # allow unprivileged users to write to /sys/devices/platform/backlight/backlight/backlight/brightness
 install -m 644 99-brightness.rules $outmnt/etc/udev/rules.d/99-brightness.rules
