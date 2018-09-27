@@ -1,0 +1,1 @@
+ACTION=="add", SUBSYSTEM=="net", DRIVERS=="ath9k_htc", RUN+="/bin/bash -c '/bin/ip link set dev %k address 00:15:5d:`/usr/bin/printf %02x $(($RANDOM % 255))`:`/usr/bin/printf %02x $(($RANDOM % 255))`:`/usr/bin/printf %02x $(($RANDOM % 255))`'"
