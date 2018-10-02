@@ -1,0 +1,5 @@
+URxvt.font: xft:Monospace:pixelsize=14
+URxvt.letterSpace: -1
+URxvt.scrollstyle: plain
+URxvt.scrollBar_right: true
+URxvt.scrollBar_floating: true

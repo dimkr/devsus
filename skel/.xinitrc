@@ -1,5 +1,6 @@
 #!/bin/sh
 
+xrdb -merge ~/.Xresources
 xsetroot -solid \#333333
 xbindkeys
 synclient HorizTwoFingerScroll=1

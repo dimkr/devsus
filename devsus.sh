@@ -167,6 +167,7 @@ install -m 644 fstab $outmnt/etc/fstab
 install -m 644 skel/.xbindkeysrc $outmnt/etc/skel/.xbindkeysrc
 install -D -m 644 skel/.config/htop/htoprc $outmnt/etc/skel/.config/htop/htoprc
 install -m 744 skel/.xinitrc $outmnt/etc/skel/.xinitrc
+install -m 644 skel/.Xresources $outmnt/etc/skel/.Xresources
 install -m 644 skel/.ratpoisonrc $outmnt/etc/skel/.ratpoisonrc
 
 # enable font hinting
