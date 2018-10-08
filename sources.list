@@ -1,2 +1,2 @@
-deb http://pkgmaster.devuan.org/merged ascii main
-deb http://pkgmaster.devuan.org/merged ascii-updates main
+deb https://pkgmaster.devuan.org/merged ascii main
+deb https://pkgmaster.devuan.org/merged ascii-updates main

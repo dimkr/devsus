@@ -129,7 +129,7 @@ install -D -m 644 80disable-recommends $outmnt/etc/apt/apt.conf.d/80disable-reco
 cp -f /etc/resolv.conf $outmnt/etc/
 chroot $outmnt apt update
 DEBIAN_FRONTEND=noninteractive chroot $outmnt apt upgrade -y
-DEBIAN_FRONTEND=noninteractive chroot $outmnt apt install -y eudev kmod net-tools inetutils-ping traceroute iproute2 isc-dhcp-client wpasupplicant iw alsa-utils cgpt elvis-tiny less psmisc netcat-traditional ca-certificates bzip2 xz-utils unscd dbus dbus-x11 bluez pulseaudio pulseaudio-module-bluetooth elogind libpam-elogind ntp xserver-xorg-core xserver-xorg-input-libinput xserver-xorg-video-fbdev libgl1-mesa-dri xserver-xorg-input-synaptics xinit x11-xserver-utils ratpoison xbindkeys xvkbd rxvt-unicode htop firefox-esr mupdf locales man-db dmz-cursor-theme
+DEBIAN_FRONTEND=noninteractive chroot $outmnt apt install -y eudev kmod net-tools inetutils-ping traceroute iproute2 isc-dhcp-client wpasupplicant iw alsa-utils cgpt elvis-tiny less psmisc netcat-traditional ca-certificates bzip2 xz-utils unscd dbus dbus-x11 bluez pulseaudio pulseaudio-module-bluetooth elogind libpam-elogind ntp xserver-xorg-core xserver-xorg-input-libinput xserver-xorg-video-fbdev libgl1-mesa-dri xserver-xorg-input-synaptics xinit x11-xserver-utils ratpoison xbindkeys xvkbd rxvt-unicode htop firefox-esr mupdf locales man-db dmz-cursor-theme apt-transport-https
 chroot $outmnt apt-get autoremove --purge
 chroot $outmnt apt-get clean
 
