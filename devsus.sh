@@ -92,7 +92,7 @@ then
 	make toolchain
 	make -C target_firmware
 	cd ..
-endif
+fi
 
 create_image() {
 	# it's a sparse file - that's how we fit a 16GB image inside a 2GB one
