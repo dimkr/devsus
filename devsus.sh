@@ -112,6 +112,12 @@ create_image() {
 	mount -o noatime ${2}p2 $5
 }
 
+if [ "$CI" = true ]
+then
+	mknod $outdev b 7 6
+	mknod $indev b 7 7
+fi
+
 # create a 2GB image with the Chrome OS partition layout
 create_image devuan-ascii-c201-libre-2GB.img $outdev 50M 40 $outmnt
 
