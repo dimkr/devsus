@@ -39,7 +39,7 @@ cleanup() {
 	losetup -d $outdev > /dev/null 2>&1
 }
 
-[ "$CI" != true ] && trap cleanup INT TERM EXIT
+trap cleanup INT TERM EXIT
 
 minor=`wget -q -O- http://linux-libre.fsfla.org/pub/linux-libre/releases/LATEST-$KVER.N/ | grep -F patch-$KVER-gnu | head -n 1 | cut -f 9 -d . | cut -f 1 -d -`
 [ ! -f linux-libre-$KVER-gnu.tar.xz ] && wget http://linux-libre.fsfla.org/pub/linux-libre/releases/LATEST-4.9.0/linux-libre-$KVER-gnu.tar.xz
@@ -70,9 +70,6 @@ $kmake SUBDIRS=drivers/net/wireless/ath/ath9k modules
 $kmake SUBDIRS=drivers/bluetooth modules
 $kmake dtbs
 
-# CI flow ends here
-[ "$CI" = true ] && exit 0
-
 $kmake zImage modules
 
 [ ! -h kernel.its ] && ln -s ../kernel.its .
@@ -89,10 +86,13 @@ vbutil_kernel --pack vmlinux.kpart \
 cd ..
 
 # build AR9271 firmware
-cd open-ath9k-htc-firmware
-make toolchain
-make -C target_firmware
-cd ..
+if [ "$CI" != true ]
+then
+	cd open-ath9k-htc-firmware
+	make toolchain
+	make -C target_firmware
+	cd ..
+endif
 
 create_image() {
 	# it's a sparse file - that's how we fit a 16GB image inside a 2GB one
@@ -185,6 +185,10 @@ install -m 644 skel/devsus.cfg $outmnt/usr/lib/firefox-esr/devsus.cfg
 dd if=linux-$KVER/vmlinux.kpart of=${outdev}p1 conv=notrunc
 make -C linux-$KVER ARCH=arm INSTALL_MOD_PATH=$outmnt modules_install
 rm -f $outmnt/lib/modules/$KVER.0-gnu/{build,source}
+
+# CI flow ends here
+[ "$CI" = true ] && exit 0
+
 install -D -m 644 open-ath9k-htc-firmware/target_firmware/htc_9271.fw $outmnt/lib/firmware/htc_9271.fw
 
 # create a 16GB image
