@@ -36,7 +36,7 @@ Devsus has been tested on Devuan 2 (ASCII) on x86_64, with the following package
 		u-boot-tools \
 		gcc make libc6-dev wget g++ cmake \
 		binfmt-support qemu-user-static debootstrap \
-		bc wget xz-utils m4 patch ca-certificates bzip2
+		bc xz-utils m4 patch ca-certificates bzip2
 
 Building
 ========
