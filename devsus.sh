@@ -135,7 +135,7 @@ install_devuan() {
 	# install Devuan on it
 	debootstrap --arch=armhf --foreign ascii $1 http://packages.devuan.org/merged
 	cp -f /usr/bin/qemu-arm-static $1/usr/bin/
-	chroot $1 /debootstrap/debootstrap
+	chroot $1 /debootstrap/debootstrap --second-stage
 
 	chroot $1 passwd -d root
 	echo -n devsus > $1/etc/hostname
