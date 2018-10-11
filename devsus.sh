@@ -70,9 +70,6 @@ $kmake SUBDIRS=drivers/net/wireless/ath/ath9k modules
 $kmake SUBDIRS=drivers/bluetooth modules
 $kmake dtbs
 
-# CI flow ends here
-[ "$CI" = true ] && exit 0
-
 $kmake zImage modules
 
 [ ! -h kernel.its ] && ln -s ../kernel.its .
@@ -86,6 +83,13 @@ vbutil_kernel --pack vmlinux.kpart \
               --signprivate /usr/share/vboot/devkeys/kernel_data_key.vbprivk \
               --config ../cmdline \
               --bootloader bootloader.bin
+if [ "$CI" = true ]
+then
+	$kmake INSTALL_MOD_PATH=linux-libre-devsus modules_install
+	cp vmlinux.kpart linux-libre-devsus/
+	tar -c linux-libre-$KVER.$minor-devsus | xz -9 -e > linux-libre-devsus.tar.xz
+	exit 0
+fi
 cd ..
 
 # build AR9271 firmware
@@ -183,7 +187,7 @@ install -m 644 skel/devsus.cfg $outmnt/usr/lib/firefox-esr/devsus.cfg
 # put the kernel in the kernel partition, modules in /lib/modules and AR9271
 # firmware in /lib/firmware
 dd if=linux-$KVER/vmlinux.kpart of=${outdev}p1 conv=notrunc
-make -C linux-$KVER ARCH=arm INSTALL_MOD_PATH=$outmnt modules_install
+$kmake -C linux-$KVER INSTALL_MOD_PATH=$outmnt modules_install
 rm -f $outmnt/lib/modules/$KVER.0-gnu/{build,source}
 install -D -m 644 open-ath9k-htc-firmware/target_firmware/htc_9271.fw $outmnt/lib/firmware/htc_9271.fw
 
