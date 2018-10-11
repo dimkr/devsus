@@ -133,7 +133,10 @@ create_image() {
 
 install_devuan() {
 	# install Devuan on it
-	qemu-debootstrap --arch=armhf ascii $1 http://packages.devuan.org/merged
+	debootstrap --arch=armhf --foreign ascii $1 http://packages.devuan.org/merged
+	cp -f /usr/bin/qemu-arm-static $1/usr/bin/
+	chroot $1 /debootstrap/debootstrap
+
 	chroot $1 passwd -d root
 	echo -n devsus > $1/etc/hostname
 
@@ -200,7 +203,9 @@ install_devuan() {
 	# put kernel modules in /lib/modules and AR9271 firmware in /lib/firmware
 	make -C linux-$KVER ARCH=arm INSTALL_MOD_PATH=$1 modules_install
 	rm -f $1/lib/modules/$KVER.0-gnu/{build,source}
-	[ "$CI" = true ] && install -D -m 644 open-ath9k-htc-firmware/target_firmware/htc_9271.fw $1/lib/firmware/htc_9271.fw
+	install -D -m 644 open-ath9k-htc-firmware/target_firmware/htc_9271.fw $1/lib/firmware/htc_9271.fw
+
+	rm -f $1/usr/bin/qemu-arm-static
 }
 
 if [ "$CI" = true ]
