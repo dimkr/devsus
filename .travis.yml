@@ -18,6 +18,7 @@
 #  MA 02110-1301, USA.
 
 language: bash
+sudo: required
 
 matrix:
   include:
@@ -26,6 +27,9 @@ matrix:
 
 services:
   - docker
+
+before_script:
+ - sudo apt-get -y install binfmt-support qemu-user-static
 
 script:
   - docker build -t devsus -f Dockerfile .

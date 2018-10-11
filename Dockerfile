@@ -21,5 +21,5 @@ FROM dyne/devuan:ascii
 
 RUN apt-get -qq update
 RUN apt-get upgrade -y
-RUN apt-get install -y --no-install-recommends --no-install-suggests ca-certificates git gcc libc-dev bc gcc-arm-none-eabi make xz-utils patch device-tree-compiler wget parted cgpt git gawk device-tree-compiler vboot-kernel-utils gcc-arm-none-eabi u-boot-tools g++ binfmt-support qemu-user-static debootstrap cmake m4 bzip2 file
+RUN apt-get install -y --no-install-recommends --no-install-suggests ca-certificates git gcc libc-dev bc gcc-arm-none-eabi make xz-utils patch device-tree-compiler wget parted cgpt git gawk device-tree-compiler vboot-kernel-utils gcc-arm-none-eabi u-boot-tools g++ qemu-user-static debootstrap cmake m4 bzip2 file
 ADD . /root

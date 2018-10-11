@@ -133,7 +133,7 @@ create_image() {
 
 install_devuan() {
 	# install Devuan on it
-	qemu-debootstrap --arch=armhf --foreign ascii --variant minbase $1 http://packages.devuan.org/merged
+	qemu-debootstrap --arch=armhf ascii $1 http://packages.devuan.org/merged
 	chroot $1 passwd -d root
 	echo -n devsus > $1/etc/hostname
 
