@@ -39,7 +39,7 @@ cleanup() {
 	losetup -d $outdev > /dev/null 2>&1
 }
 
-trap cleanup INT TERM EXIT
+[ "$CI" != true ] && trap cleanup INT TERM EXIT
 
 minor=`wget -q -O- http://linux-libre.fsfla.org/pub/linux-libre/releases/LATEST-$KVER.N/ | grep -F patch-$KVER-gnu | head -n 1 | cut -f 9 -d . | cut -f 1 -d -`
 [ ! -f linux-libre-$KVER-gnu.tar.xz ] && wget http://linux-libre.fsfla.org/pub/linux-libre/releases/LATEST-4.9.0/linux-libre-$KVER-gnu.tar.xz
@@ -86,13 +86,10 @@ vbutil_kernel --pack vmlinux.kpart \
 cd ..
 
 # build AR9271 firmware
-if [ "$CI" != true ]
-then
-	cd open-ath9k-htc-firmware
-	make toolchain
-	make -C target_firmware
-	cd ..
-fi
+cd open-ath9k-htc-firmware
+make toolchain
+make -C target_firmware
+cd ..
 
 create_image() {
 	# it's a sparse file - that's how we fit a 16GB image inside a 2GB one
@@ -112,90 +109,91 @@ create_image() {
 	mount -o noatime ${2}p2 $5
 }
 
+install_devuan() {
+	# install Devuan on it
+	qemu-debootstrap --arch=armhf --foreign ascii --variant minbase $1 http://packages.devuan.org/merged
+	chroot $1 passwd -d root
+	echo -n devsus > $1/etc/hostname
+
+	# install stable release updates as soon as they're available
+	install -m 644 sources.list $1/etc/apt/sources.list
+
+	# disable installation of recommended, not strictly necessary packages
+	install -D -m 644 80disable-recommends $1/etc/apt/apt.conf.d/80disable-recommends
+
+	cp -f /etc/resolv.conf $1/etc/
+	chroot $1 apt update
+	DEBIAN_FRONTEND=noninteractive chroot $1 apt upgrade -y
+	DEBIAN_FRONTEND=noninteractive chroot $1 apt install -y eudev kmod net-tools inetutils-ping traceroute iproute2 isc-dhcp-client wpasupplicant iw alsa-utils cgpt elvis-tiny less psmisc netcat-traditional ca-certificates bzip2 xz-utils unscd dbus dbus-x11 bluez pulseaudio pulseaudio-module-bluetooth elogind libpam-elogind ntp xserver-xorg-core xserver-xorg-input-libinput xserver-xorg-video-fbdev libgl1-mesa-dri xserver-xorg-input-synaptics xinit x11-xserver-utils ratpoison xbindkeys xvkbd rxvt-unicode htop firefox-esr mupdf locales man-db dmz-cursor-theme apt-transport-https
+	chroot $1 apt-get autoremove --purge
+	chroot $1 apt-get clean
+
+	# set the default PulseAudio devices; otherwise, it uses dummy ones
+	echo "load-module module-alsa-sink device=sysdefault
+	load-module module-alsa-source device=sysdefault" >> $1/etc/pulse/default.pa
+
+	# disable saving of dmesg output in /var/log
+	chroot $1 update-rc.d bootlogs disable
+
+	# reduce the number of virtual consoles
+	sed -i s/^[3-6]/\#\&/g $1/etc/inittab
+
+	# enable DNS cache
+	sed -i s/'enable-cache            hosts   no'/'enable-cache            hosts   yes'/ -i $1/etc/nscd.conf
+
+	# prevent DNS lookup of the default hostname, which dicloses the OS to a
+	# potential attacker
+	echo "127.0.0.1 devsus" >> $1/etc/hosts
+
+	# block malware and advertising domains
+	cat hosts >> $1/etc/hosts
+
+	rm -f $1/etc/resolv.conf $1/var/log/*log $1/var/log/dmesg $1/var/log/fsck/* $1/var/log/apt/*
+
+	# allow unprivileged users to write to /sys/devices/platform/backlight/backlight/backlight/brightness
+	install -m 644 99-brightness.rules $1/etc/udev/rules.d/99-brightness.rules
+
+	# give ath9k_htc devices a random MAC address
+	install -m 644 98-mac.rules $1/etc/udev/rules.d/98-mac.rules
+
+	# make /tmp a tmpfs, to reduce disk I/O
+	install -m 644 fstab $1/etc/fstab
+
+	install -m 644 skel/.xbindkeysrc $1/etc/skel/.xbindkeysrc
+	install -D -m 644 skel/.config/htop/htoprc $1/etc/skel/.config/htop/htoprc
+	install -m 744 skel/.xinitrc $1/etc/skel/.xinitrc
+	install -m 644 skel/.Xresources $1/etc/skel/.Xresources
+	install -m 644 skel/.ratpoisonrc $1/etc/skel/.ratpoisonrc
+
+	# enable font hinting
+	install -D -m 644 skel/.config/fontconfig/conf.d/99-devsus.conf $1/etc/skel/.config/fontconfig/conf.d/99-devsus.conf
+
+	# set the cursor theme
+	install -D -m 644 skel/.icons/default/index.theme $1/etc/skel/.icons/default/index.theme
+
+	# change the default settings of firefox-esr
+	install -m 644 skel/devsus-settings.js $1/usr/lib/firefox-esr/defaults/pref/devsus-settings.js
+	install -m 644 skel/devsus.cfg $1/usr/lib/firefox-esr/devsus.cfg
+
+	# put kernel modules in /lib/modules and AR9271 firmware in /lib/firmware
+	make -C linux-$KVER ARCH=arm INSTALL_MOD_PATH=$1 modules_install
+	rm -f $1/lib/modules/$KVER.0-gnu/{build,source}
+	[ "$CI" = true ] && install -D -m 644 open-ath9k-htc-firmware/target_firmware/htc_9271.fw $1/lib/firmware/htc_9271.fw
+}
+
 if [ "$CI" = true ]
 then
-	mknod $outdev b 7 6
-	mknod $indev b 7 7
+	install_devuan rootfs
+	exit 0
 fi
 
 # create a 2GB image with the Chrome OS partition layout
 create_image devuan-ascii-c201-libre-2GB.img $outdev 50M 40 $outmnt
 
-# install Devuan on it
-qemu-debootstrap --arch=armhf --foreign ascii --variant minbase $outmnt http://packages.devuan.org/merged
-chroot $outmnt passwd -d root
-echo -n devsus > $outmnt/etc/hostname
+install_devuan $outmnt
 
-# install stable release updates as soon as they're available
-install -m 644 sources.list $outmnt/etc/apt/sources.list
-
-# disable installation of recommended, not strictly necessary packages
-install -D -m 644 80disable-recommends $outmnt/etc/apt/apt.conf.d/80disable-recommends
-
-cp -f /etc/resolv.conf $outmnt/etc/
-chroot $outmnt apt update
-DEBIAN_FRONTEND=noninteractive chroot $outmnt apt upgrade -y
-DEBIAN_FRONTEND=noninteractive chroot $outmnt apt install -y eudev kmod net-tools inetutils-ping traceroute iproute2 isc-dhcp-client wpasupplicant iw alsa-utils cgpt elvis-tiny less psmisc netcat-traditional ca-certificates bzip2 xz-utils unscd dbus dbus-x11 bluez pulseaudio pulseaudio-module-bluetooth elogind libpam-elogind ntp xserver-xorg-core xserver-xorg-input-libinput xserver-xorg-video-fbdev libgl1-mesa-dri xserver-xorg-input-synaptics xinit x11-xserver-utils ratpoison xbindkeys xvkbd rxvt-unicode htop firefox-esr mupdf locales man-db dmz-cursor-theme apt-transport-https
-chroot $outmnt apt-get autoremove --purge
-chroot $outmnt apt-get clean
-
-# set the default PulseAudio devices; otherwise, it uses dummy ones
-echo "load-module module-alsa-sink device=sysdefault
-load-module module-alsa-source device=sysdefault" >> $outmnt/etc/pulse/default.pa
-
-# disable saving of dmesg output in /var/log
-chroot $outmnt update-rc.d bootlogs disable
-
-# reduce the number of virtual consoles
-sed -i s/^[3-6]/\#\&/g $outmnt/etc/inittab
-
-# enable DNS cache
-sed -i s/'enable-cache            hosts   no'/'enable-cache            hosts   yes'/ -i $outmnt/etc/nscd.conf
-
-# prevent DNS lookup of the default hostname, which dicloses the OS to a
-# potential attacker
-echo "127.0.0.1 devsus" >> $outmnt/etc/hosts
-
-# block malware and advertising domains
-cat hosts >> $outmnt/etc/hosts
-
-rm -f $outmnt/etc/resolv.conf $outmnt/var/log/*log $outmnt/var/log/dmesg $outmnt/var/log/fsck/* $outmnt/var/log/apt/*
-
-# allow unprivileged users to write to /sys/devices/platform/backlight/backlight/backlight/brightness
-install -m 644 99-brightness.rules $outmnt/etc/udev/rules.d/99-brightness.rules
-
-# give ath9k_htc devices a random MAC address
-install -m 644 98-mac.rules $outmnt/etc/udev/rules.d/98-mac.rules
-
-# make /tmp a tmpfs, to reduce disk I/O
-install -m 644 fstab $outmnt/etc/fstab
-
-install -m 644 skel/.xbindkeysrc $outmnt/etc/skel/.xbindkeysrc
-install -D -m 644 skel/.config/htop/htoprc $outmnt/etc/skel/.config/htop/htoprc
-install -m 744 skel/.xinitrc $outmnt/etc/skel/.xinitrc
-install -m 644 skel/.Xresources $outmnt/etc/skel/.Xresources
-install -m 644 skel/.ratpoisonrc $outmnt/etc/skel/.ratpoisonrc
-
-# enable font hinting
-install -D -m 644 skel/.config/fontconfig/conf.d/99-devsus.conf $outmnt/etc/skel/.config/fontconfig/conf.d/99-devsus.conf
-
-# set the cursor theme
-install -D -m 644 skel/.icons/default/index.theme $outmnt/etc/skel/.icons/default/index.theme
-
-# change the default settings of firefox-esr
-install -m 644 skel/devsus-settings.js $outmnt/usr/lib/firefox-esr/defaults/pref/devsus-settings.js
-install -m 644 skel/devsus.cfg $outmnt/usr/lib/firefox-esr/devsus.cfg
-
-# put the kernel in the kernel partition, modules in /lib/modules and AR9271
-# firmware in /lib/firmware
+# put the kernel in the kernel partition
 dd if=linux-$KVER/vmlinux.kpart of=${outdev}p1 conv=notrunc
-make -C linux-$KVER ARCH=arm INSTALL_MOD_PATH=$outmnt modules_install
-rm -f $outmnt/lib/modules/$KVER.0-gnu/{build,source}
-
-# CI flow ends here
-[ "$CI" = true ] && exit 0
-
-install -D -m 644 open-ath9k-htc-firmware/target_firmware/htc_9271.fw $outmnt/lib/firmware/htc_9271.fw
 
 # create a 16GB image
 create_image devuan-ascii-c201-libre-16GB.img $indev 512 30785536 $inmnt
