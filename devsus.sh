@@ -87,8 +87,30 @@ cd ..
 
 # build AR9271 firmware
 cd open-ath9k-htc-firmware
-make toolchain
+if [ "$CI" = true ]
+then
+	if [ -d ../open-ath9k-htc-firmware-toolchain ]
+	then
+		mv ../open-ath9k-htc-firmware-toolchain toolchain/inst
+	else
+		make toolchain
+	fi
+else
+	make toolchain
+fi
 make -C target_firmware
+if [ "$CI" = true ]
+then
+	find toolchain/inst | while read x
+	do
+		case "`file -bi $x`" in
+			*x-executable*)
+				strip -s $x
+				;;
+		esac
+	done
+	mv toolchain/inst ../open-ath9k-htc-firmware-toolchain
+fi
 cd ..
 
 create_image() {

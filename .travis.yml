@@ -30,3 +30,7 @@ services:
 script:
   - docker build -t devsus -f Dockerfile .
   - docker run -e CI -w /root devsus ./devsus.sh
+
+cache:
+  directories:
+    - open-ath9k-htc-firmware-toolchain
