@@ -17,8 +17,9 @@
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #  MA 02110-1301, USA.
 
-FROM debian:stretch
+FROM dyne/devuan:ascii
 
 RUN apt-get -qq update
+RUN apt-get upgrade -y
 RUN apt-get install -y --no-install-recommends --no-install-suggests ca-certificates git gcc libc-dev bc gcc-arm-none-eabi make xz-utils patch device-tree-compiler wget u-boot-tools vboot-kernel-utils debootstrap
 ADD . /root
