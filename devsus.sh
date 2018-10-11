@@ -109,7 +109,7 @@ then
 				;;
 		esac
 	done
-	mv toolchain/inst/* ../open-ath9k-htc-firmware-toolchain/
+	mv toolchain/inst ../open-ath9k-htc-firmware-toolchain
 fi
 cd ..
 
