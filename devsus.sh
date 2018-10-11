@@ -89,7 +89,7 @@ cd ..
 cd open-ath9k-htc-firmware
 if [ "$CI" = true ]
 then
-	if [ -d ../open-ath9k-htc-firmware-toolchain ]
+	if [ -f ../open-ath9k-htc-firmware-toolchain/bin/xtensa-elf-gcc ]
 	then
 		mv ../open-ath9k-htc-firmware-toolchain toolchain/inst
 	else
@@ -109,7 +109,7 @@ then
 				;;
 		esac
 	done
-	mv toolchain/inst ../open-ath9k-htc-firmware-toolchain
+	mv toolchain/inst/* ../open-ath9k-htc-firmware-toolchain/
 fi
 cd ..
 
