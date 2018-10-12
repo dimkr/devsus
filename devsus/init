@@ -1,0 +1,67 @@
+#!/bin/dash
+
+if [ -f /debootstrap/debootstrap ]
+then
+	/debootstrap/debootstrap --second-stage
+
+	passwd -d root
+	echo -n devsus > /etc/hostname
+
+	# install stable release updates as soon as they're available
+	install -m 644 /opt/devsus/sources.list /etc/apt/sources.list
+
+	# disable installation of recommended, not strictly necessary packages
+	install -D -m 644 /opt/devsus/80disable-recommends /etc/apt/apt.conf.d/80disable-recommends
+
+	apt-get autoremove --purge
+	apt-get clean
+
+	# set the default PulseAudio devices; otherwise, it uses dummy ones
+	echo "load-module module-alsa-sink device=sysdefault
+load-module module-alsa-source device=sysdefault" >> /etc/pulse/default.pa
+
+	# disable saving of dmesg output in /var/log
+	update-rc.d bootlogs disable
+
+	# reduce the number of virtual consoles
+	sed -i s/^[3-6]/\#\&/g /etc/inittab
+
+	# enable DNS cache
+	sed -i s/'enable-cache            hosts   no'/'enable-cache            hosts   yes'/ -i /etc/nscd.conf
+
+	# prevent DNS lookup of the default hostname, which dicloses the OS to a
+	# potential attacker
+	echo "127.0.0.1 devsus" >> /etc/hosts
+
+	# block malware and advertising domains
+	cat /opt/devsus/hosts >> /etc/hosts
+
+	rm -f /var/log/*log /var/log/dmesg /var/log/fsck/* /var/log/apt/*
+
+	# allow unprivileged users to write to /sys/devices/platform/backlight/backlight/backlight/brightness
+	install -m 644 /opt/devsus/99-brightness.rules /etc/udev/rules.d/99-brightness.rules
+
+	# give ath9k_htc devices a random MAC address
+	install -m 644 /opt/devsus/98-mac.rules /etc/udev/rules.d/98-mac.rules
+
+	# make /tmp a tmpfs, to reduce disk I/O
+	install -m 644 /opt/devsus/fstab /etc/fstab
+
+	install -m 644 /opt/devsus/.xbindkeysrc /etc/skel/.xbindkeysrc
+	install -D -m 644 /opt/devsus/htoprc /etc/skel/.config/htop/htoprc
+	install -m 744 /opt/devsus/.xinitrc /etc/skel/.xinitrc
+	install -m 644 /opt/devsus/.Xresources /etc/skel/.Xresources
+	install -m 644 /opt/devsus/.ratpoisonrc /etc/skel/.ratpoisonrc
+
+	# enable font hinting
+	install -D -m 644 /opt/devsus/99-hinting.conf /etc/skel/.config/fontconfig/conf.d/99-hinting.conf
+
+	# set the cursor theme
+	install -D -m 644 /opt/devsus/index.theme /etc/skel/.icons/default/index.theme
+
+	# change the default settings of firefox-esr
+	install -m 644 /opt/devsus/devsus-settings.js /usr/lib/firefox-esr/defaults/pref/devsus-settings.js
+	install -m 644 /opt/devsus/devsus.cfg /usr/lib/firefox-esr/devsus.cfg
+endif
+
+exec /sbin/init
