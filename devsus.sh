@@ -118,7 +118,6 @@ install_devuan() {
 	install -D -m 644 devsus/sources.list $1/opt/devsus/sources.list
 	for i in 80disable-recommends hosts 99-brightness.rules 98-mac.rules fstab .xbindkeysrc htoprc .Xresources .ratpoisonrc 99-hinting.conf index.theme devsus-settings.js devsus.cfg
 	do
-	done
 		install -m 644 devsus/$i $1/opt/devsus/$i
 	done
 	install -m 744 devsus/.xinitrc $1/opt/devsus/.xinitrc
