@@ -45,3 +45,10 @@ deploy:
   on:
     all_branches: true
     repo: dimkr/devsus
+
+before_cache:
+  - rm -f dl/hosts
+
+cache:
+  directories:
+    - dl

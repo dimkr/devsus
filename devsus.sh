@@ -42,20 +42,20 @@ cleanup() {
 [ "$CI" != true ] && trap cleanup INT TERM EXIT
 
 minor=`wget -q -O- http://linux-libre.fsfla.org/pub/linux-libre/releases/LATEST-$KVER.N/ | grep -F patch-$KVER-gnu | head -n 1 | cut -f 9 -d . | cut -f 1 -d -`
-[ ! -f linux-libre-$KVER-gnu.tar.xz ] && wget http://linux-libre.fsfla.org/pub/linux-libre/releases/LATEST-4.9.0/linux-libre-$KVER-gnu.tar.xz
-[ ! -f patch-$KVER-gnu-$KVER.$minor-gnu ] && wget -O- https://www.linux-libre.fsfla.org/pub/linux-libre/releases/LATEST-$KVER.N/patch-$KVER-gnu-$KVER.$minor-gnu.xz | xz -d > patch-$KVER-gnu-$KVER.$minor-gnu
-[ ! -f ath9k_htc_do_not_use_bulk_on_ep3_and_ep4.patch ] && wget -O ath9k_htc_do_not_use_bulk_on_ep3_and_ep4.patch https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/patch/?id=2b721118b7821107757eb1d37af4b60e877b27e7
+[ ! -f dl/linux-libre-$KVER-gnu.tar.xz ] && wget -O dl/linux-libre-$KVER-gnu.tar.xz http://linux-libre.fsfla.org/pub/linux-libre/releases/LATEST-4.9.0/linux-libre-$KVER-gnu.tar.xz
+[ ! -f dl/patch-$KVER-gnu-$KVER.$minor-gnu ] && wget -O- https://www.linux-libre.fsfla.org/pub/linux-libre/releases/LATEST-$KVER.N/patch-$KVER-gnu-$KVER.$minor-gnu.xz | xz -d > dl/patch-$KVER-gnu-$KVER.$minor-gnu
+[ ! -f dl/ath9k_htc_do_not_use_bulk_on_ep3_and_ep4.patch ] && wget -O dl/ath9k_htc_do_not_use_bulk_on_ep3_and_ep4.patch https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/patch/?id=2b721118b7821107757eb1d37af4b60e877b27e7
+[ ! -f dl/hosts ] && wget -O- https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews/hosts | grep ^0\.0\.0\.0 | awk '{print $1" "$2}' | grep -F -v "0.0.0.0 0.0.0.0" > dl/hosts
 [ ! -d open-ath9k-htc-firmware ] && git clone --depth 1 https://github.com/qca/open-ath9k-htc-firmware.git
-[ ! -f hosts ] && wget -O- https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews/hosts | grep ^0\.0\.0\.0 | awk '{print $1" "$2}' | grep -F -v "0.0.0.0 0.0.0.0" > hosts
 
 # build Linux-libre
-[ ! -d linux-$KVER ] && tar -xJf linux-libre-$KVER-gnu.tar.xz
+[ ! -d linux-$KVER ] && tar -xJf dl/linux-libre-$KVER-gnu.tar.xz
 cd linux-$KVER
-patch -p 1 < ../patch-$KVER-gnu-$KVER.$minor-gnu
+patch -p 1 < ../dl/patch-$KVER-gnu-$KVER.$minor-gnu
 make clean
 make mrproper
 # work around instability of ath9k_htc, see https://github.com/SolidHal/PrawnOS/issues/38
-patch -R -p 1 < ../ath9k_htc_do_not_use_bulk_on_ep3_and_ep4.patch
+patch -R -p 1 < ../dl/ath9k_htc_do_not_use_bulk_on_ep3_and_ep4.patch
 # reset the minor version number, so out-of-tree drivers continue to work after
 # a kernel upgrade
 sed s/'SUBLEVEL = .*'/'SUBLEVEL = 0'/ -i Makefile
@@ -120,8 +120,9 @@ install_devuan() {
 	do
 		install -m 644 devsus/$i $1/opt/devsus/$i
 	done
-	install -m 644 hosts $1/opt/devsus/hosts
+	install -m 644 dl/hosts $1/opt/devsus/hosts
 	install -m 744 devsus/.xinitrc $1/opt/devsus/.xinitrc
+	install -m 755 devsus/init $1/opt/devsus/init
 
 	# put kernel modules in /lib/modules and AR9271 firmware in /lib/firmware
 	$kmake -C linux-$KVER INSTALL_MOD_PATH=$1 modules_install
@@ -133,9 +134,9 @@ install_devuan() {
 
 if [ "$CI" = true ]
 then
-	install_devuan devsus
-	install -D -m 644 linux-$KVER/vmlinux.kpart devsus/boot/vmlinux.kpart
-	tar -c devsus | gzip -9 > devsus.tar.gz
+	install_devuan devsus-rootfs
+	install -D -m 644 linux-$KVER/vmlinux.kpart devsus-rootfs/boot/vmlinux.kpart
+	tar -c devsus-rootfs | gzip -1 > devsus-rootfs.tar.gz
 	exit 0
 fi
 
