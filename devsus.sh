@@ -91,6 +91,7 @@ if [ "$CI" = true ]
 then
 	if [ -d ../dl/xtensa-toolchain ]
 	then
+		mkdir toolchain
 		mv ../dl/xtensa-toolchain toolchain/inst
 	else
 		make toolchain
