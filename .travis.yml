@@ -44,4 +44,5 @@ deploy:
     - devsus.tar.gz
   skip_cleanup: true
   on:
+    all_branches: true
     repo: dimkr/devsus
