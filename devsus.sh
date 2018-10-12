@@ -127,6 +127,8 @@ install_devuan() {
 	$kmake -C linux-$KVER INSTALL_MOD_PATH=$1 modules_install
 	rm -f $1/lib/modules/$KVER.0-gnu/{build,source}
 	[ "$CI" != true ] && install -D -m 644 open-ath9k-htc-firmware/target_firmware/htc_9271.fw $1/lib/firmware/htc_9271.fw
+
+	return 0
 }
 
 if [ "$CI" = true ]
