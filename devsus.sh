@@ -116,10 +116,11 @@ install_devuan() {
 	debootstrap --arch=armhf --foreign --variant=minbase --include=eudev,kmod,net-tools,inetutils-ping,traceroute,iproute2,isc-dhcp-client,wpasupplicant,iw,alsa-utils,cgpt,elvis-tiny,less,psmisc,netcat-traditional,ca-certificates,bzip2,xz-utils,unscd,dbus,dbus-x11,bluez,pulseaudio,pulseaudio-module-bluetooth,elogind,libpam-elogind,ntp,xserver-xorg-core,xserver-xorg-input-libinput,xserver-xorg-video-fbdev,libgl1-mesa-dri,xserver-xorg-input-synaptics,xinit,x11-xserver-utils,ratpoison,xbindkeys,xvkbd,rxvt-unicode,htop,firefox-esr,mupdf,locales,man-db,dmz-cursor-theme,apt-transport-https ascii $1 http://packages.devuan.org/merged
 
 	install -D -m 644 devsus/sources.list $1/opt/devsus/sources.list
-	for i in 80disable-recommends hosts 99-brightness.rules 98-mac.rules fstab .xbindkeysrc htoprc .Xresources .ratpoisonrc 99-hinting.conf index.theme devsus-settings.js devsus.cfg
+	for i in 80disable-recommends 99-brightness.rules 98-mac.rules fstab .xbindkeysrc htoprc .Xresources .ratpoisonrc 99-hinting.conf index.theme devsus-settings.js devsus.cfg
 	do
 		install -m 644 devsus/$i $1/opt/devsus/$i
 	done
+	install -m 644 hosts $1/opt/devsus/hosts
 	install -m 744 devsus/.xinitrc $1/opt/devsus/.xinitrc
 
 	# put kernel modules in /lib/modules and AR9271 firmware in /lib/firmware
