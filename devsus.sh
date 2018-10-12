@@ -113,7 +113,7 @@ create_image() {
 }
 
 install_devuan() {
-	debootstrap --arch=armhf --foreign ascii --variant minbase $1 http://packages.devuan.org/merged eudev kmod net-tools inetutils-ping traceroute iproute2 isc-dhcp-client wpasupplicant iw alsa-utils cgpt elvis-tiny less psmisc netcat-traditional ca-certificates bzip2 xz-utils unscd dbus dbus-x11 bluez pulseaudio pulseaudio-module-bluetooth elogind libpam-elogind ntp xserver-xorg-core xserver-xorg-input-libinput xserver-xorg-video-fbdev libgl1-mesa-dri xserver-xorg-input-synaptics xinit x11-xserver-utils ratpoison xbindkeys xvkbd rxvt-unicode htop firefox-esr mupdf locales man-db dmz-cursor-theme apt-transport-https
+	debootstrap --arch=armhf --foreign --variant=minbase --include=eudev,kmod,net-tools,inetutils-ping,traceroute,iproute2,isc-dhcp-client,wpasupplicant,iw,alsa-utils,cgpt,elvis-tiny,less,psmisc,netcat-traditional,ca-certificates,bzip2,xz-utils,unscd,dbus,dbus-x11,bluez,pulseaudio,pulseaudio-module-bluetooth,elogind,libpam-elogind,ntp,xserver-xorg-core,xserver-xorg-input-libinput,xserver-xorg-video-fbdev,libgl1-mesa-dri,xserver-xorg-input-synaptics,xinit,x11-xserver-utils,ratpoison,xbindkeys,xvkbd,rxvt-unicode,htop,firefox-esr,mupdf,locales,man-db,dmz-cursor-theme,apt-transport-https ascii $1 http://packages.devuan.org/merged
 
 	install -D -m 644 devsus/sources.list $1/opt/devsus/sources.list
 	for i in 80disable-recommends hosts 99-brightness.rules 98-mac.rules fstab .xbindkeysrc htoprc .Xresources .ratpoisonrc 99-hinting.conf index.theme devsus-settings.js devsus.cfg
