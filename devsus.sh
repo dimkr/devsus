@@ -86,13 +86,21 @@ vbutil_kernel --pack vmlinux.kpart \
 cd ..
 
 # build AR9271 firmware
-if [ "$CI" != true ]
+cd open-ath9k-htc-firmware
+if [ "$CI" = true ]
 then
-	cd open-ath9k-htc-firmware
+	if [ -d ../dl/xtensa-toolchain ]
+	then
+		mv ../dl/xtensa-toolchain toolchain/inst
+	else
+		make toolchain
+	fi
+else
 	make toolchain
-	make -C target_firmware
-	cd ..
 fi
+make -C target_firmware
+[ "$CI" = true ] && mv toolchain/inst ../dl/xtensa-toolchain
+cd ..
 
 create_image() {
 	# it's a sparse file - that's how we fit a 16GB image inside a 2GB one
@@ -127,7 +135,7 @@ install_devuan() {
 	# put kernel modules in /lib/modules and AR9271 firmware in /lib/firmware
 	$kmake -C linux-$KVER INSTALL_MOD_PATH=$1 modules_install
 	rm -f $1/lib/modules/$KVER.0-gnu/{build,source}
-	[ "$CI" != true ] && install -D -m 644 open-ath9k-htc-firmware/target_firmware/htc_9271.fw $1/lib/firmware/htc_9271.fw
+	install -D -m 644 open-ath9k-htc-firmware/target_firmware/htc_9271.fw $1/lib/firmware/htc_9271.fw
 
 	return 0
 }
