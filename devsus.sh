@@ -133,9 +133,9 @@ install_devuan() {
 
 if [ "$CI" = true ]
 then
-	install_devuan rootfs
-	install -D -m 644 linux-$KVER/vmlinux.kpart rootfs/boot/vmlinux.kpart
-	tar -c rootfs | gzip -9 > devsus.tar.gz
+	install_devuan devsus
+	install -D -m 644 linux-$KVER/vmlinux.kpart devsus/boot/vmlinux.kpart
+	tar -c devsus | gzip -9 > devsus.tar.gz
 	exit 0
 fi
 
