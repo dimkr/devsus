@@ -81,6 +81,8 @@ load-module module-alsa-source device=sysdefault" >> /etc/pulse/default.pa
 	# change the default settings of firefox-esr
 	install -m 644 /opt/devsus/devsus-settings.js /usr/lib/firefox-esr/defaults/pref/devsus-settings.js
 	install -m 644 /opt/devsus/devsus.cfg /usr/lib/firefox-esr/devsus.cfg
+
+	clear
 fi
 
 exec /sbin/init
