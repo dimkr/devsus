@@ -28,7 +28,7 @@ Also, the images contain:
 Releases
 ========
 
-Devsus' root file system is built by a CI/CD flow on [Travis CI](https://travis-ci.org/dimkr/devsus), that operates on the Devsus master branch. This file system contains an up-to-date kernel, kernel modules, firmware and Devuan.
+Devsus' root file system is built by a CI/CD flow on [Travis CI](https://travis-ci.org/dimkr/devsus), after each push to the master branch, or once a week. This file system contains an up-to-date kernel, kernel modules, firmware and Devuan.
 
 The root file system is put in a tarball that is uploaded to [GitHub](https://github.com/dimkr/devsus/releases).
 
