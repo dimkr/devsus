@@ -25,37 +25,31 @@ Also, the images contain:
 * A [Ratpoison](https://www.nongnu.org/ratpoison/)-based, keyboard-controlled, graphical environment
 * [Firefox](https://www.mozilla.org/en-US/firefox/) ESR, pre-configured for enhanced privacy and responsiveness on the C201
 
-Dependencies
-============
-
-Devsus has been tested on Devuan 2 (ASCII) on x86_64, with the following packages installed:
-
-	apt install --no-install-recommends --no-install-suggests \
-		parted cgpt \
-		git gawk device-tree-compiler vboot-kernel-utils gcc-arm-none-eabi \
-		u-boot-tools \
-		gcc make libc6-dev wget g++ cmake \
-		binfmt-support qemu-user-static debootstrap \
-		bc xz-utils m4 patch ca-certificates bzip2
-
-Building
+Releases
 ========
 
-	# ./devsus.sh
+Devsus' root file system is built by a CI/CD flow on [Travis CI](https://travis-ci.org/dimkr/devsus), that operates on the Devsus master branch. This file system contains an up-to-date kernel, kernel modules, firmware and Devuan.
 
-This produces two Devuan disk images:
+The root file system is put in a tarball that is uploaded to [GitHub](https://github.com/dimkr/devsus/releases).
 
-1. devuan-ascii-c201-libre-16GB.img, a 16 GB image suitable for persistent installation; its size should be exactly the size of the internal SSD
-2. devuan-ascii-c201-libre-2GB.img, a 2 GB image suitable for booting the laptop off USB
+In order to run Devsus, one has to unpack this tarball onto an existing bootable media, or produce bootable images.
 
 Usage
 =====
+
+	# apt install --no-install-recommends --no-install-suggests parted cgpt
+	# ./devsus.sh
+
+This downloads the root file system tarball and creates two Devuan disk images:
+
+1. devuan-ascii-c201-libre-16GB.img, a 16 GB image suitable for persistent installation; its size should be exactly the size of the internal SSD
+2. devuan-ascii-c201-libre-2GB.img, a 2 GB image suitable for booting the laptop off USB
 
 To produce a bootable media, write the 2 GB image to a flash drive (of at least 2 GB):
 
 	# dd if=$SOMEWHERE/devuan-ascii-c201-libre-2GB.img of=/dev/$DEVICE bs=50M
 
-The root password is blank.
+During the first boot, packages will be installed and configured. Once packages are configured, the login prompt will appear; the root password is blank.
 
 The 2 GB image (yes, the smaller one) contains the larger, 16 GB one under /. This way, it is possible to boot the laptop through USB, then install Devuan persistently without having to download or store the large image separately.
 
