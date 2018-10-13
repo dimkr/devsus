@@ -27,6 +27,10 @@ matrix:
 services:
   - docker
 
+git:
+  depth: 5
+  quiet: true
+
 script:
   - docker build -t devsus -f Dockerfile .
   - docker run -e CI -w /root/devsus -v `pwd`:/root/devsus devsus ./devsus.sh

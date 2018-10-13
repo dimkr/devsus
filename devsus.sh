@@ -21,8 +21,9 @@
 
 KVER=4.9
 
-outmnt=$(mktemp -d -p `pwd`)
-inmnt=$(mktemp -d -p `pwd`)
+here=`pwd`
+outmnt=$(mktemp -d -p $here)
+inmnt=$(mktemp -d -p $here)
 
 outdev=/dev/loop6
 indev=/dev/loop7
@@ -143,7 +144,7 @@ install_devuan() {
 
 if [ "$CI" = true ]
 then
-	install_devuan devsus-rootfs
+	install_devuan $here/devsus-rootfs
 	install -D -m 644 linux-$KVER/vmlinux.kpart devsus-rootfs/boot/vmlinux.kpart
 	tar -c devsus-rootfs | gzip -1 > devsus-rootfs.tar.gz
 	exit 0
