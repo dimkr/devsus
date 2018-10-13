@@ -24,8 +24,6 @@ KVER=4.9
 here=`pwd`
 outmnt=$(mktemp -d -p $here)
 inmnt=$(mktemp -d -p $here)
-branch=`git symbolic-ref --short HEAD`
-commit=`git log --format=%h -1`
 
 outdev=/dev/loop6
 indev=/dev/loop7
@@ -143,6 +141,9 @@ then
 	install -D -m 644 linux-$KVER/vmlinux.kpart devsus-rootfs/boot/vmlinux.kpart
 	tar -c devsus-rootfs | gzip -1 > devsus-rootfs.tar.gz
 else
+	branch=`git symbolic-ref --short HEAD`
+	commit=`git log --format=%h -1`
+
 	[ ! -f dl/devsus-rootfs.tar.gz ] && wget -O dl/devsus-rootfs.tar.gz https://github.com/dimkr/devsus/releases/download/$branch-$commit/devsus-rootfs.tar.gz
 
 	trap cleanup INT TERM EXIT
