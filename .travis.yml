@@ -47,7 +47,6 @@ deploy:
   file: devsus-rootfs.tar.gz
   skip_cleanup: true
   on:
-    all_branches: true
     repo: dimkr/devsus
 
 before_cache:
