@@ -37,7 +37,6 @@ In order to run Devsus, one has to unpack this tarball onto an existing bootable
 Usage
 =====
 
-	# apt install --no-install-recommends --no-install-suggests parted cgpt
 	# ./devsus.sh
 
 This downloads the root file system tarball and creates two Devuan disk images:

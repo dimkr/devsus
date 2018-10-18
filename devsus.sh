@@ -25,19 +25,14 @@ here=`pwd`
 outmnt=$(mktemp -d -p $here)
 inmnt=$(mktemp -d -p $here)
 
-outdev=/dev/loop6
-indev=/dev/loop7
-
 cleanup() {
 	set +e
 
 	umount -l $inmnt > /dev/null 2>&1
 	rmdir $inmnt > /dev/null 2>&1
-	losetup -d $indev > /dev/null 2>&1
 
 	umount -l $outmnt > /dev/null 2>&1
 	rmdir $outmnt > /dev/null 2>&1
-	losetup -d $outdev > /dev/null 2>&1
 }
 
 install_devuan() {
@@ -62,7 +57,7 @@ install_devuan() {
 
 create_image() {
 	# it's a sparse file - that's how we fit a 16GB image inside a 2GB one
-	dd if=/dev/zero of=$1 bs=$3 count=$4 conv=sparse
+	dd if=/dev/zero of=$1 bs=$2 count=$3 conv=sparse
 	parted --script $1 mklabel gpt
 	cgpt create $1
 	cgpt add -i 1 -t kernel -b 8192 -s 65536 -l Kernel -S 1 -T 5 -P 10 $1
@@ -71,11 +66,7 @@ create_image() {
 	size=$(($end - $start))
 	cgpt add -i 2 -t data -b $start -s $size -l Root $1
 	# $size is in 512 byte blocks while ext4 uses a block size of 1024 bytes
-	losetup -P $2 $1
-	mkfs.ext4 -F -b 1024 -m 0 -O ^has_journal ${2}p2 $(($size / 2))
-
-	# mount the / partition
-	mount -o noatime ${2}p2 $5
+	mkfs.ext4 -F -b 1024 -m 0 -O ^has_journal -E offset=$(($start * 512)) $1 $(($size / 2))
 }
 
 if [ "$CI" = true ]
@@ -140,34 +131,38 @@ then
 	install_devuan $here/devsus-rootfs
 	install -D -m 644 linux-$KVER/vmlinux.kpart devsus-rootfs/boot/vmlinux.kpart
 	tar -c devsus-rootfs | gzip -1 > devsus-rootfs.tar.gz
+
+	# create 2GB and 16GB images with the Chrome OS partition layout
+	create_image devuan-ascii-c201-libre-2GB.img 50M 40
+	create_image devuan-ascii-c201-libre-16GB.img 512 30785536
+	GZIP=-1 tar -cSzf devsus-templates.tar.gz devuan-ascii-c201-libre-2GB.img devuan-ascii-c201-libre-16GB.img
 else
 	branch=`git symbolic-ref --short HEAD`
 	commit=`git log --format=%h -1`
 
 	[ ! -f dl/devsus-rootfs.tar.gz ] && wget -O dl/devsus-rootfs.tar.gz https://github.com/dimkr/devsus/releases/download/$branch-$commit/devsus-rootfs.tar.gz
+	[ ! -f dl/devsus-templates.tar.gz ] && wget -O dl/devsus-templates.tar.gz https://github.com/dimkr/devsus/releases/download/$branch-$commit/devsus-templates.tar.gz
+
+	tar -xzf dl/devsus-templates.tar.gz
 
 	trap cleanup INT TERM EXIT
 
-	# create a 2GB image with the Chrome OS partition layout
-	create_image devuan-ascii-c201-libre-2GB.img $outdev 50M 40 $outmnt
+	# mount the / partition of both images
+	off=$(((8192 + 65536) * 512))
+	mount -o loop,noatime,offset=$off devuan-ascii-c201-libre-2GB.img $outmnt
+	mount -o loop,noatime,offset=$off devuan-ascii-c201-libre-16GB.img $inmnt
 
-	# install Devuan on it
+	# unpack Devuan
 	tar -C $outmnt -xf dl/devsus-rootfs.tar.gz --strip-components=1
+	cp -a $outmnt/* $inmnt/
 
 	# put the kernel in the kernel partition
-	dd if=$outmnt/boot/vmlinux.kpart of=${outdev}p1 conv=notrunc
-
-	# create a 16GB image
-	create_image devuan-ascii-c201-libre-16GB.img $indev 512 30785536 $inmnt
-
-	# copy the kernel and / of the 2GB image to the 16GB one
-	dd if=${outdev}p1 of=${indev}p1 conv=notrunc
-	cp -a $outmnt/* $inmnt/
+	dd if=$outmnt/boot/vmlinux.kpart of=devuan-ascii-c201-libre-2GB.img conv=notrunc seek=8192
+	dd if=$outmnt/boot/vmlinux.kpart of=devuan-ascii-c201-libre-16GB.img conv=notrunc seek=8192
 
 	umount -l $inmnt
 	rmdir $inmnt
-	losetup -d $indev
 
-	# move the 16GB image inside the 2GB one
-	cp -f devuan-ascii-c201-libre-16GB.img $outmnt/
+	# put the 16GB image inside the 2GB one
+	cp -f --sparse=always devuan-ascii-c201-libre-16GB.img $outmnt/
 fi
