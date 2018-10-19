@@ -54,6 +54,9 @@ load-module module-alsa-source device=sysdefault" >> /etc/pulse/default.pa
 	# potential attacker
 	echo "127.0.0.1 devsus" >> /etc/hosts
 
+	# use global NTP servers instead of those that diclose the OS
+	sed -i s/debian\.pool/pool/g -i /etc/ntp.conf
+
 	# block malware and advertising domains
 	cat /opt/devsus/hosts >> /etc/hosts
 
