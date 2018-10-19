@@ -21,6 +21,8 @@
 
 if [ -f /debootstrap/debootstrap ]
 then
+	clear
+
 	/debootstrap/debootstrap --second-stage
 
 	passwd -d root
