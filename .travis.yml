@@ -50,6 +50,7 @@ deploy:
   skip_cleanup: true
   on:
     repo: dimkr/devsus
+  overwrite: true
 
 before_cache:
   - rm -f dl/hosts
