@@ -17,12 +17,7 @@
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #  MA 02110-1301, USA.
 
-language: bash
-
-matrix:
-  include:
-    - os: linux
-      dist: trusty
+language: minimal
 
 services:
   - docker
@@ -32,8 +27,7 @@ git:
   quiet: true
 
 script:
-  - docker build -t devsus -f Dockerfile .
-  - docker run -e CI -w /root/devsus -v `pwd`:/root/devsus devsus ./devsus.sh
+  - docker run -e CI -w /root/devsus -v `pwd`:/root/devsus dimkr/devsus:latest ./devsus.sh
 
 before_deploy:
   - git config --local user.name "Dima Krasner"
