@@ -44,6 +44,7 @@ deploy:
   skip_cleanup: true
   on:
     repo: dimkr/devsus
+    all_branches: true
   overwrite: true
 
 before_cache:
