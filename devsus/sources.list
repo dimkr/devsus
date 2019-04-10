@@ -1,2 +1,2 @@
-deb https://pkgmaster.devuan.org/merged ceres main
-deb https://pkgmaster.devuan.org/merged ceres-updates main
+deb https://pkgmaster.devuan.org/merged ascii main
+deb https://pkgmaster.devuan.org/merged ascii-updates main

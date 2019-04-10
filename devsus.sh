@@ -2,7 +2,7 @@
 
 #  this file is part of Devsus.
 #
-#  Copyright 2017, 2018, 2019 Dima Krasner
+#  Copyright 2017, 2018 Dima Krasner
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@ cleanup() {
 }
 
 install_devuan() {
-	debootstrap --arch=armhf --foreign --variant=minbase --include=eudev,kmod,net-tools,inetutils-ping,traceroute,iproute2,isc-dhcp-client,wpasupplicant,iw,alsa-utils,cgpt,elvis-tiny,less,psmisc,netcat-traditional,ca-certificates,bzip2,xz-utils,unscd,dbus,dbus-x11,bluez,pulseaudio,pulseaudio-module-bluetooth,elogind,libpam-elogind,ntp,xserver-xorg-core,xserver-xorg-input-libinput,xserver-xorg-video-fbdev,libgl1-mesa-dri,xserver-xorg-input-synaptics,xinit,x11-xserver-utils,ratpoison,xbindkeys,xvkbd,rxvt-unicode,htop,firefox-esr,mupdf,locales,man-db,dmz-cursor-theme,apt-transport-https ceres $1 http://packages.devuan.org/merged
+	debootstrap --arch=armhf --foreign --variant=minbase --include=eudev,kmod,net-tools,inetutils-ping,traceroute,iproute2,isc-dhcp-client,wpasupplicant,iw,alsa-utils,cgpt,elvis-tiny,less,psmisc,netcat-traditional,ca-certificates,bzip2,xz-utils,unscd,dbus,dbus-x11,bluez,pulseaudio,pulseaudio-module-bluetooth,elogind,libpam-elogind,ntp,xserver-xorg-core,xserver-xorg-input-libinput,xserver-xorg-video-fbdev,libgl1-mesa-dri,xserver-xorg-input-synaptics,xinit,x11-xserver-utils,ratpoison,xbindkeys,xvkbd,rxvt-unicode,htop,firefox-esr,mupdf,locales,man-db,dmz-cursor-theme,apt-transport-https ascii $1 http://packages.devuan.org/merged
 
 	install -D -m 644 devsus/sources.list $1/opt/devsus/sources.list
 	for i in 80disable-recommends 99-brightness.rules 98-mac.rules fstab .xbindkeysrc htoprc .Xresources .ratpoisonrc 99-hinting.conf index.theme devsus-settings.js devsus.cfg
@@ -133,9 +133,9 @@ then
 	tar -c devsus-rootfs | gzip -1 > devsus-rootfs.tar.gz
 
 	# create 2GB and 16GB images with the Chrome OS partition layout
-	create_image devuan-ceres-c201-libre-2GB.img 50M 40
-	create_image devuan-ceres-c201-libre-16GB.img 512 30785536
-	GZIP=-1 tar -cSzf devsus-templates.tar.gz devuan-ceres-c201-libre-2GB.img devuan-ceres-c201-libre-16GB.img
+	create_image devuan-ascii-c201-libre-2GB.img 50M 40
+	create_image devuan-ascii-c201-libre-16GB.img 512 30785536
+	GZIP=-1 tar -cSzf devsus-templates.tar.gz devuan-ascii-c201-libre-2GB.img devuan-ascii-c201-libre-16GB.img
 else
 	branch=`git symbolic-ref --short HEAD`
 	commit=`git log --format=%h -1`
@@ -149,20 +149,20 @@ else
 
 	# mount the / partition of both images
 	off=$(((8192 + 65536) * 512))
-	mount -o loop,noatime,offset=$off devuan-ceres-c201-libre-2GB.img $outmnt
-	mount -o loop,noatime,offset=$off devuan-ceres-c201-libre-16GB.img $inmnt
+	mount -o loop,noatime,offset=$off devuan-ascii-c201-libre-2GB.img $outmnt
+	mount -o loop,noatime,offset=$off devuan-ascii-c201-libre-16GB.img $inmnt
 
 	# unpack Devuan
 	tar -C $outmnt -xf dl/devsus-rootfs.tar.gz --strip-components=1
 	cp -a $outmnt/* $inmnt/
 
 	# put the kernel in the kernel partition
-	dd if=$outmnt/boot/vmlinux.kpart of=devuan-ceres-c201-libre-2GB.img conv=notrunc seek=8192
-	dd if=$outmnt/boot/vmlinux.kpart of=devuan-ceres-c201-libre-16GB.img conv=notrunc seek=8192
+	dd if=$outmnt/boot/vmlinux.kpart of=devuan-ascii-c201-libre-2GB.img conv=notrunc seek=8192
+	dd if=$outmnt/boot/vmlinux.kpart of=devuan-ascii-c201-libre-16GB.img conv=notrunc seek=8192
 
 	umount -l $inmnt
 	rmdir $inmnt
 
 	# put the 16GB image inside the 2GB one
-	cp -f --sparse=always devuan-ceres-c201-libre-16GB.img $outmnt/
+	cp -f --sparse=always devuan-ascii-c201-libre-16GB.img $outmnt/
 fi
