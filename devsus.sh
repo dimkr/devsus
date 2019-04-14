@@ -72,7 +72,7 @@ create_image() {
 if [ "$CI" = true ]
 then
 	minor=`wget -q -O- http://linux-libre.fsfla.org/pub/linux-libre/releases/LATEST-$KVER.N/ | grep -F patch-$KVER-gnu | head -n 1 | cut -f 9 -d . | cut -f 1 -d -`
-	[ ! -f dl/linux-libre-$KVER-gnu.tar.xz ] && wget -O dl/linux-libre-$KVER-gnu.tar.xz http://linux-libre.fsfla.org/pub/linux-libre/releases/LATEST-4.9.0/linux-libre-$KVER-gnu.tar.xz
+	[ ! -f dl/linux-libre-$KVER-gnu.tar.xz ] && wget -O dl/linux-libre-$KVER-gnu.tar.xz http://linux-libre.fsfla.org/pub/linux-libre/releases/LATEST-$KVER.0/linux-libre-$KVER-gnu.tar.xz
 	[ ! -f dl/patch-$KVER-gnu-$KVER.$minor-gnu ] && wget -O- https://www.linux-libre.fsfla.org/pub/linux-libre/releases/LATEST-$KVER.N/patch-$KVER-gnu-$KVER.$minor-gnu.xz | xz -d > dl/patch-$KVER-gnu-$KVER.$minor-gnu
 	[ ! -f dl/ath9k_htc_do_not_use_bulk_on_ep3_and_ep4.patch ] && wget -O dl/ath9k_htc_do_not_use_bulk_on_ep3_and_ep4.patch https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/patch/?id=2b721118b7821107757eb1d37af4b60e877b27e7
 	[ ! -f dl/hosts ] && wget -O- https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews/hosts | grep ^0\.0\.0\.0 | awk '{print $1" "$2}' | grep -F -v "0.0.0.0 0.0.0.0" > dl/hosts
