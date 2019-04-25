@@ -19,7 +19,7 @@
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #  MA 02110-1301, USA.
 
-[ ! -f cache/hosts ] && wget -O- https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews/hosts | grep ^0\.0\.0\.0 | awk '{print $1" "$2}' | grep -F -v "0.0.0.0 0.0.0.0" > cache/hosts
+[ ! -f hosts ] && wget -O- https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews/hosts | grep ^0\.0\.0\.0 | awk '{print $1" "$2}' | grep -F -v "0.0.0.0 0.0.0.0" > hosts
 
 debootstrap --arch=armhf --foreign --variant=minbase --include=eudev,kmod,net-tools,inetutils-ping,traceroute,iproute2,isc-dhcp-client,wpasupplicant,iw,alsa-utils,cgpt,elvis-tiny,less,psmisc,netcat-traditional,ca-certificates,bzip2,xz-utils,unscd,dbus,dbus-x11,bluez,pulseaudio,pulseaudio-module-bluetooth,elogind,libpam-elogind,ntp,xserver-xorg-core,xserver-xorg-input-libinput,xserver-xorg-video-fbdev,libgl1-mesa-dri,xserver-xorg-input-synaptics,xinit,x11-xserver-utils,ratpoison,xbindkeys,xvkbd,rxvt-unicode,htop,firefox-esr,mupdf,locales,man-db,dmz-cursor-theme,apt-transport-https ascii devsus-rootfs http://packages.devuan.org/merged
 
@@ -28,7 +28,7 @@ for i in 80disable-recommends 99-brightness.rules 98-mac.rules fstab .xbindkeysr
 do
 	install -m 644 devsus/$i devsus-rootfs/opt/devsus/$i
 done
-install -m 644 cache/hosts devsus-rootfs/opt/devsus/hosts
+install -m 644 hosts devsus-rootfs/opt/devsus/hosts
 install -m 744 devsus/.xinitrc devsus-rootfs/opt/devsus/.xinitrc
 install -m 755 devsus/init devsus-rootfs/opt/devsus/init
 

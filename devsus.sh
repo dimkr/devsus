@@ -36,6 +36,8 @@ cleanup() {
 branch=`git symbolic-ref --short HEAD`
 commit=`git log --format=%h -1`
 
+mkdir -p dl
+
 [ ! -f dl/devsus-kernel.tar.gz ] && wget -O dl/devsus-kernel.tar.gz https://github.com/dimkr/devsus/releases/download/$branch-$commit/devsus-kernel.tar.gz
 [ ! -f dl/devsus-firmware.tar.gz ] && wget -O dl/devsus-firmware.tar.gz https://github.com/dimkr/devsus/releases/download/$branch-$commit/devsus-firmware.tar.gz
 [ ! -f dl/devsus-rootfs.tar.gz ] && wget -O dl/devsus-rootfs.tar.gz https://github.com/dimkr/devsus/releases/download/$branch-$commit/devsus-rootfs.tar.gz

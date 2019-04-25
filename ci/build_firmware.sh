@@ -23,15 +23,15 @@
 
 # build AR9271 firmware
 cd open-ath9k-htc-firmware
-if [ -d ../cache/xtensa-toolchain ]
+if [ -d ../firmware-cache/xtensa-toolchain ]
 then
 	mkdir toolchain
-	mv ../cache/xtensa-toolchain toolchain/inst
+	mv ../firmware-cache/xtensa-toolchain toolchain/inst
 else
 	make toolchain
 fi
 CROSS_COMPILE=`pwd`/../ci/xtensa-elf- make -C target_firmware
-mv toolchain/inst ../cache/xtensa-toolchain
+mv toolchain/inst ../firmware-cache/xtensa-toolchain
 cd ..
 
 # put AR9271 firmware in /lib/firmware

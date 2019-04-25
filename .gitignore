@@ -1,6 +1,7 @@
-devuan-*-c201-libre-*GB.img
-open-ath9k-htc-firmware
-linux-*
-dl/*
-cache/*
-devsus-*
+/devuan-*-c201-libre-*GB.img
+/open-ath9k-htc-firmware
+/linux-*
+/dl
+/hosts
+/*-cache
+/devsus-*

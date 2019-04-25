@@ -29,7 +29,7 @@ git:
 jobs:
   include:
     - stage: build
-      script: docker run --rm -e CI -w /root/devsus -v `pwd`:/root/devsus -v `pwd`/cache:/root/.ccache dimkr/devsus:latest ./ci/build_kernel.sh
+      script: docker run --rm -e CI -w /root/devsus -v `pwd`:/root/devsus -v `pwd`/kernel-cache:/root/.ccache dimkr/devsus:latest ./ci/build_kernel.sh
       name: Kernel
       deploy:
         provider: releases
@@ -41,7 +41,7 @@ jobs:
           repo: dimkr/devsus
           all_branches: true
         overwrite: true
-    - script: docker run --rm -e CI -w /root/devsus -v `pwd`:/root/devsus -v `pwd`/cache:/root/.ccache dimkr/devsus:latest ./ci/build_firmware.sh
+    - script: docker run --rm -e CI -w /root/devsus -v `pwd`:/root/devsus -v `pwd`/firmware-cache:/root/.ccache dimkr/devsus:latest ./ci/build_firmware.sh
       name: Firmware
       deploy:
         provider: releases
@@ -83,10 +83,7 @@ before_deploy:
   - git config --local user.email "dima@dimakrasner.com"
   - git tag -f "$TRAVIS_BRANCH-$(git log --format=%h -1)"
 
-before_cache:
-  - rm -f dl/hosts
-
 cache:
   directories:
-    - dl
-    - cache
+    - kernel-cache
+    - firmware-cache
