@@ -1,6 +1,6 @@
 #  this file is part of Devsus.
 #
-#  Copyright 2018 Dima Krasner
+#  Copyright 2018, 2019 Dima Krasner
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -19,4 +19,4 @@
 
 FROM dyne/devuan:ascii
 
-RUN apt-get -qq update && apt-get upgrade -y && apt-get install -y --no-install-recommends --no-install-suggests ca-certificates git gcc libc-dev bc gcc-arm-none-eabi make xz-utils patch device-tree-compiler wget u-boot-tools vboot-kernel-utils debootstrap kmod m4 cmake bzip2 g++ parted cgpt e2fsprogs && apt-get autoremove --purge && apt-get autoclean
+RUN apt-get -qq update && apt-get upgrade -y && apt-get install -y --no-install-recommends --no-install-suggests ca-certificates git gcc libc-dev bc gcc-arm-none-eabi make xz-utils patch device-tree-compiler wget u-boot-tools vboot-kernel-utils debootstrap kmod m4 cmake bzip2 g++ parted cgpt e2fsprogs && apt-get autoremove --purge && apt-get autoclean ccache
