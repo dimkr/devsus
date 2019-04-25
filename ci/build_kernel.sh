@@ -21,6 +21,8 @@
 
 KVER=4.9
 
+here=`pwd`
+
 minor=`wget -q -O- http://linux-libre.fsfla.org/pub/linux-libre/releases/LATEST-$KVER.N/ | grep -F patch-$KVER-gnu | head -n 1 | cut -f 9 -d . | cut -f 1 -d -`
 [ ! -f kernel-cache/linux-libre-$KVER-gnu.tar.xz ] && wget -O kernel-cache/linux-libre-$KVER-gnu.tar.xz http://linux-libre.fsfla.org/pub/linux-libre/releases/LATEST-$KVER.0/linux-libre-$KVER-gnu.tar.xz
 [ ! -f kernel-cache/patch-$KVER-gnu-$KVER.$minor-gnu ] && wget -O- https://www.linux-libre.fsfla.org/pub/linux-libre/releases/LATEST-$KVER.N/patch-$KVER-gnu-$KVER.$minor-gnu.xz | xz -d > kernel-cache/patch-$KVER-gnu-$KVER.$minor-gnu
@@ -39,7 +41,7 @@ patch -R -p 1 < ../kernel-cache/ath9k_htc_do_not_use_bulk_on_ep3_and_ep4.patch
 sed s/'SUBLEVEL = .*'/'SUBLEVEL = 0'/ -i Makefile
 cp -f ../kernel/config .config
 
-export PATH=`pwd`/ci:$PATH
+export PATH=$here/ci:$PATH
 kmake="make -j `nproc` CROSS_COMPILE=arm-none-eabi- ARCH=arm"
 
 $kmake olddefconfig
@@ -66,6 +68,6 @@ vbutil_kernel --pack ../devsus-kernel/boot/vmlinux.kpart \
 cd ..
 
 # put kernel modules in /lib/modules
-$kmake -C linux-$KVER INSTALL_MOD_PATH=devsus-kernel modules_install
+$kmake -C linux-$KVER INSTALL_MOD_PATH=$here/devsus-kernel modules_install
 rm -f devsus-kernel/lib/modules/$KVER.0-gnu/{build,source}
 tar -c devsus-kernel | gzip -1 > devsus-kernel.tar.gz
