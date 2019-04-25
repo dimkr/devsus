@@ -125,7 +125,7 @@ then
 	else
 		make toolchain
 	fi
-	make -C target_firmware
+	CROSS_COMPILE=$here/xtensa-elf- make -C target_firmware
 	mv toolchain/inst ../dl/xtensa-toolchain
 	cd ..
 
