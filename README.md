@@ -28,11 +28,11 @@ Also, the images contain:
 Releases
 ========
 
-Devsus' root file system is built by a CI/CD flow on [Travis CI](https://travis-ci.org/dimkr/devsus), after each push to the master branch, or once a week. This file system contains an up-to-date kernel, kernel modules, firmware and Devuan.
+Devsus has a CI/CD flow on [Travis CI](https://travis-ci.org/dimkr/devsus), which gets triggered after each push to the master branch, or once a week.
 
-The root file system is put in a tarball that is uploaded to [GitHub](https://github.com/dimkr/devsus/releases).
+It builds tarballs containing an up-to-date kernel, kernel modules, firmware and a Devuan root file system, then uploads the tarballs to [GitHub](https://github.com/dimkr/devsus/releases).
 
-In order to run Devsus, one has to unpack this tarball onto an existing bootable media, or produce bootable images.
+In order to run Devsus, one has to unpack these tarballs onto an existing bootable media, or produce bootable images using devsus.sh (see below).
 
 Usage
 =====
