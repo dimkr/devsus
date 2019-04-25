@@ -1,6 +1,6 @@
 #  this file is part of Devsus.
 #
-#  Copyright 2018 Dima Krasner
+#  Copyright 2018, 2019 Dima Krasner
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ git:
   quiet: true
 
 script:
-  - docker run -e CI -w /root/devsus -v `pwd`:/root/devsus dimkr/devsus:latest ./devsus.sh
+  - docker run -e CI -w /root/devsus -v `pwd`:/root/devsus -v `pwd`/ccache:/root/.ccache dimkr/devsus:latest ./devsus.sh
 
 before_deploy:
   - git config --local user.name "Dima Krasner"
@@ -53,3 +53,4 @@ before_cache:
 cache:
   directories:
     - dl
+    - ccache

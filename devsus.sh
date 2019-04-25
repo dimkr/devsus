@@ -2,7 +2,7 @@
 
 #  this file is part of Devsus.
 #
-#  Copyright 2017, 2018 Dima Krasner
+#  Copyright 2017, 2018, 2019 Dima Krasner
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -91,7 +91,7 @@ then
 	sed s/'SUBLEVEL = .*'/'SUBLEVEL = 0'/ -i Makefile
 	cp -f ../config .config
 
-	kmake="make -j `grep ^processor /proc/cpuinfo  | wc -l` CROSS_COMPILE=arm-none-eabi- ARCH=arm"
+	kmake="make -j `nproc` CROSS_COMPILE=arm-none-eabi- CC='ccache arm-none-eabi-gcc' ARCH=arm"
 
 	$kmake olddefconfig
 	$kmake modules_prepare
