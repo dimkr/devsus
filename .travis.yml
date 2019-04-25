@@ -30,9 +30,13 @@ jobs:
   include:
     - stage: build
       script: docker run --rm -e CI -w /root/devsus -v `pwd`:/root/devsus -v `pwd`/cache:/root/.ccache dimkr/devsus:latest ./ci/build_kernel.sh
+      name: Kernel
     - script: docker run --rm -e CI -w /root/devsus -v `pwd`:/root/devsus -v `pwd`/cache:/root/.ccache dimkr/devsus:latest ./ci/build_firmware.sh
+      name: Firmware
     - script: docker run --rm -e CI -w /root/devsus -v `pwd`:/root/devsus dimkr/devsus:latest ./ci/build_rootfs.sh
-    - script: docker run --rm -e CI -w /root/devsus -v `pwd`:/root/devsus dimkr/devsus:latest ./ci/build_images.sh
+      name: "Root file system"
+    - script: docker run --rm -e CI -w /root/devsus -v `pwd`:/root/devsus dimkr/devsus:latest ./ci/build_templates.sh
+      name: "Image templates"
 
 before_deploy:
   - git config --local user.name "Dima Krasner"
