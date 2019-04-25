@@ -27,7 +27,7 @@ git:
   quiet: true
 
 script:
-  - docker run -e CI -w /root/devsus -v `pwd`:/root/devsus -v `pwd`/ccache:/root/.ccache dimkr/devsus:latest ./devsus.sh
+  - docker run -e CI -w /root/devsus -v `pwd`:/root/devsus -v `pwd`/cache:/root/.ccache dimkr/devsus:latest ./devsus.sh
 
 before_deploy:
   - git config --local user.name "Dima Krasner"
@@ -53,4 +53,4 @@ before_cache:
 cache:
   directories:
     - dl
-    - ccache
+    - cache
