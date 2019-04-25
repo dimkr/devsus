@@ -91,7 +91,7 @@ then
 	sed s/'SUBLEVEL = .*'/'SUBLEVEL = 0'/ -i Makefile
 	cp -f ../config .config
 
-	kmake="make -j `nproc` CROSS_COMPILE=arm-none-eabi- CC='ccache arm-none-eabi-gcc' ARCH=arm"
+	kmake="make -j `nproc` CROSS_COMPILE=arm-none-eabi- CC=\"ccache arm-none-eabi-gcc\" ARCH=arm"
 
 	$kmake olddefconfig
 	$kmake modules_prepare
