@@ -49,8 +49,8 @@ trap cleanup INT TERM EXIT
 
 # mount the / partition of both images
 off=$(((8192 + 65536) * 512))
-mount -o loop,noatime,offset=$off devuan-ascii-c201-libre-2GB.img $outmnt
-mount -o loop,noatime,offset=$off devuan-ascii-c201-libre-16GB.img $inmnt
+mount -o loop,noatime,offset=$off devuan-beowulf-c201-libre-2GB.img $outmnt
+mount -o loop,noatime,offset=$off devuan-beowulf-c201-libre-16GB.img $inmnt
 
 # unpack Devuan
 for i in rootfs kernel firmware
@@ -60,11 +60,11 @@ done
 cp -a $outmnt/* $inmnt/
 
 # put the kernel in the kernel partition
-dd if=$outmnt/boot/vmlinux.kpart of=devuan-ascii-c201-libre-2GB.img conv=notrunc seek=8192
-dd if=$outmnt/boot/vmlinux.kpart of=devuan-ascii-c201-libre-16GB.img conv=notrunc seek=8192
+dd if=$outmnt/boot/vmlinux.kpart of=devuan-beowulf-c201-libre-2GB.img conv=notrunc seek=8192
+dd if=$outmnt/boot/vmlinux.kpart of=devuan-beowulf-c201-libre-16GB.img conv=notrunc seek=8192
 
 umount -l $inmnt
 rmdir $inmnt
 
 # put the 16GB image inside the 2GB one
-cp -f --sparse=always devuan-ascii-c201-libre-16GB.img $outmnt/
+cp -f --sparse=always devuan-beowulf-c201-libre-16GB.img $outmnt/

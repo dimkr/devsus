@@ -41,12 +41,12 @@ Usage
 
 This downloads the root file system tarball and creates two Devuan disk images:
 
-1. devuan-ascii-c201-libre-16GB.img, a 16 GB image suitable for persistent installation; its size should be exactly the size of the internal SSD
-2. devuan-ascii-c201-libre-2GB.img, a 2 GB image suitable for booting the laptop off USB
+1. devuan-beowulf-c201-libre-16GB.img, a 16 GB image suitable for persistent installation; its size should be exactly the size of the internal SSD
+2. devuan-beowulf-c201-libre-2GB.img, a 2 GB image suitable for booting the laptop off USB
 
 To produce a bootable media, write the 2 GB image to a flash drive (of at least 2 GB):
 
-	# dd if=$SOMEWHERE/devuan-ascii-c201-libre-2GB.img of=/dev/$DEVICE bs=50M
+	# dd if=$SOMEWHERE/devuan-beowulf-c201-libre-2GB.img of=/dev/$DEVICE bs=50M
 
 During the first boot, packages will be installed and configured. Once packages are configured, the login prompt will appear; the root password is blank.
 
@@ -54,7 +54,7 @@ The 2 GB image (yes, the smaller one) contains the larger, 16 GB one under /. Th
 
 Persistent installation is performed using dd, too:
 
-	# dd if=/devuan-ascii-c201-libre-16GB.img of=/dev/mmcblk0
+	# dd if=/devuan-beowulf-c201-libre-16GB.img of=/dev/mmcblk0
 
 Graphical Desktop
 =================

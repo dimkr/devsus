@@ -34,6 +34,6 @@ create_image() {
 }
 
 # create 2GB and 16GB images with the Chrome OS partition layout
-create_image devuan-ascii-c201-libre-2GB.img 50M 40
-create_image devuan-ascii-c201-libre-16GB.img 512 30785536
-GZIP=-1 tar -cSzf devsus-templates.tar.gz devuan-ascii-c201-libre-2GB.img devuan-ascii-c201-libre-16GB.img
+create_image devuan-beowulf-c201-libre-2GB.img 50M 40
+create_image devuan-beowulf-c201-libre-16GB.img 512 30785536
+GZIP=-1 tar -cSzf devsus-templates.tar.gz devuan-beowulf-c201-libre-2GB.img devuan-beowulf-c201-libre-16GB.img
